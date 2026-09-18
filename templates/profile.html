@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}User Profile{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
+                    <h4 class="mb-0 text-primary fw-bold"><i class="bi bi-person-circle"></i> My Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">FULL NAME</label>
+                            <div class="fs-5 fw-semibold border-bottom pb-2">{{ user.name }}</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">EMAIL ADDRESS</label>
+                            <div class="fs-5 fw-semibold border-bottom pb-2">{{ user.email }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">ACCOUNT ROLE</label>
+                            <div class="fs-5 pb-2">
+                                <span class="badge bg-primary text-uppercase px-3">{{ user.role }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">DATE REGISTERED</label>
+                            <div class="fs-5 fw-semibold border-bottom pb-2">{{ user.created_at.strftime('%B %d, %Y (%H:%M UTC)') }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top d-flex justify-content-between">
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary px-4"><i class="bi bi-arrow-left"></i> Dashboard</a>
+                        <span class="text-muted small align-self-center">For security, contact an administrator to update registration fields.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,259 @@
+{% extends "public_base.html" %}
+
+{% block title %}LexAI - AI Legal Assistant{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<header class="hero-section position-relative overflow-hidden">
+    <!-- Geometric Grid Background (Bold Moment) -->
+    <div class="hero-grid-bg"></div>
+    <div class="container position-relative px-5 pb-5 pt-5 mt-4">
+        <div class="row gx-5 align-items-center">
+            <div class="col-xxl-8 col-xl-9 col-lg-10">
+                <div class="badge bg-slate-800 text-info px-3 py-2 rounded-pill mb-4 border border-slate-800 shadow-sm fw-medium">
+                    <i class="bi bi-stars me-1"></i> Meet your new legal intelligence platform
+                </div>
+                <h1 class="display-3 fw-bold mb-4 hero-title">
+                    LexAI<br>
+                    <span class="text-slate-300 fs-1 mt-2 d-block">AI-Powered Legal Intelligence.</span>
+                </h1>
+                <p class="lead fw-normal text-slate-400 mb-5 max-w-2xl lh-lg">
+                    Understand legal documents. Explore legal knowledge. Get intelligent AI-powered assistance for contracts, rights, and obligations in seconds.
+                </p>
+                <div class="d-grid gap-3 d-sm-flex">
+                    {% if not current_user.is_authenticated %}
+                        <a class="btn btn-electric btn-lg px-5 py-3 me-sm-3 fw-semibold shadow-sm" href="{{ url_for('auth.register') }}">Get Started</a>
+                    {% else %}
+                        <a class="btn btn-electric btn-lg px-5 py-3 me-sm-3 fw-semibold shadow-sm" href="{{ url_for('main.dashboard') }}">Go to Dashboard</a>
+                    {% endif %}
+                    <a class="btn btn-outline-slate btn-lg px-5 py-3 fw-semibold" id="btn-learn-more" href="#features">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Features Section -->
+<section id="features" class="py-5 bg-white">
+    <div class="container px-5 py-5">
+        <div class="text-center mb-5">
+            <h6 class="text-info fw-bold text-uppercase tracking-wider mb-2">Capabilities</h6>
+            <h2 class="fw-bold text-slate-900 mb-3">Comprehensive Legal Toolset</h2>
+            <p class="lead text-slate-500 max-w-2xl mx-auto">LexAI combines advanced language models with secure document handling to streamline your legal workflows.</p>
+        </div>
+        <div class="row g-5 mt-2">
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm p-4 hover-lift">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-chat-square-text"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">AI Legal Chat</h5>
+                    <p class="text-slate-500 mb-0">Ask complex legal questions, clarify jargon, and explore legal concepts using our general legal AI assistant.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm p-4 hover-lift">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-file-earmark-bar-graph"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Document Analysis</h5>
+                    <p class="text-slate-500 mb-0">Automatically extract parties, obligations, risks, financial terms, and red flags from any contract.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm p-4 hover-lift">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Knowledge Base</h5>
+                    <p class="text-slate-500 mb-0">Access a curated library of verified legal articles and concepts integrated directly into your workflow.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 offset-lg-2">
+                <div class="card h-100 border-0 shadow-sm p-4 hover-lift">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-file-earmark-check"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Document-based RAG</h5>
+                    <p class="text-slate-500 mb-0">Chat securely with your uploaded files. Our system retrieves exact context from your documents to ground AI answers.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm p-4 hover-lift">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Legal Insights</h5>
+                    <p class="text-slate-500 mb-0">Get professional summaries, spot missing clauses, and receive structural recommendations for your agreements.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-5 bg-slate-50 border-top border-slate-200">
+    <div class="container px-5 py-5">
+        <div class="text-center mb-5">
+            <h6 class="text-info fw-bold text-uppercase tracking-wider mb-2">Process</h6>
+            <h2 class="fw-bold text-slate-900 mb-3">How LexAI Works</h2>
+        </div>
+        <div class="row g-4 align-items-center justify-content-center mt-3">
+            <div class="col-md-4 text-center">
+                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                    <span class="fs-3 fw-bold text-slate-900">1</span>
+                </div>
+                <h5 class="fw-bold">Upload Document</h5>
+                <p class="text-slate-500 px-3">Upload your contract or legal agreement securely to your private workspace.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-4 border border-info" style="width: 80px; height: 80px;">
+                    <span class="fs-3 fw-bold text-info">2</span>
+                </div>
+                <h5 class="fw-bold">LexAI Analyzes</h5>
+                <p class="text-slate-500 px-3">Our AI extracts and analyzes the content, breaking it down into structured insights.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                    <span class="fs-3 fw-bold text-slate-900">3</span>
+                </div>
+                <h5 class="fw-bold">Review & Ask</h5>
+                <p class="text-slate-500 px-3">Review the generated risks and obligations, or chat directly with the document.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section (Presentational) -->
+<section id="pricing" class="py-5 bg-slate-900">
+    <div class="container px-5 py-5">
+        <div class="text-center mb-5">
+            <h6 class="text-info fw-bold text-uppercase tracking-wider mb-2">Pricing</h6>
+            <h2 class="fw-bold text-white mb-3">Simple, Transparent Plans</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">Choose the tier that fits your legal analysis needs.</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <!-- Free Tier -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 bg-slate-800 border-slate-700 text-white">
+                    <div class="card-body p-5">
+                        <h4 class="fw-bold mb-3">Basic</h4>
+                        <div class="mb-4">
+                            <span class="display-4 fw-bold">$0</span><span class="text-slate-400">/mo</span>
+                        </div>
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-3 d-flex"><i class="bi bi-check2 text-info me-2 fs-5"></i> <span class="text-slate-300">5 document uploads/month</span></li>
+                            <li class="mb-3 d-flex"><i class="bi bi-check2 text-info me-2 fs-5"></i> <span class="text-slate-300">Basic AI Chat</span></li>
+                            <li class="mb-3 d-flex"><i class="bi bi-check2 text-info me-2 fs-5"></i> <span class="text-slate-300">Access to Knowledge Base</span></li>
+                            <li class="mb-3 d-flex text-slate-500"><i class="bi bi-dash me-2 fs-5"></i> <span>Advanced Contract Analysis</span></li>
+                        </ul>
+                        <div class="d-grid mt-auto pt-4">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-slate text-white w-100 py-2">Get Started</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Pro Tier -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 bg-slate-50 border-info border-2 position-relative shadow-lg transform-scale-105">
+                    <div class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-info text-slate-900 px-3 py-2 fw-bold shadow-sm">
+                        MOST POPULAR
+                    </div>
+                    <div class="card-body p-5">
+                        <h4 class="fw-bold text-slate-900 mb-3">Professional</h4>
+                        <div class="mb-4">
+                            <span class="display-4 fw-bold text-slate-900">$49</span><span class="text-slate-500">/mo</span>
+                        </div>
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-3 d-flex"><i class="bi bi-check2 text-info me-2 fs-5"></i> <span class="text-slate-700 fw-medium">Unlimited document uploads</span></li>
+                            <li class="mb-3 d-flex"><i class="bi bi-check2 text-info me-2 fs-5"></i> <span class="text-slate-700 fw-medium">Priority AI Chat processing</span></li>
+                            <li class="mb-3 d-flex"><i class="bi bi-check2 text-info me-2 fs-5"></i> <span class="text-slate-700 fw-medium">Full Knowledge Base access</span></li>
+                            <li class="mb-3 d-flex"><i class="bi bi-check2 text-info me-2 fs-5"></i> <span class="text-slate-700 fw-medium">Advanced Contract Analysis</span></li>
+                        </ul>
+                        <div class="d-grid mt-auto pt-4">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-electric w-100 py-2 fw-bold shadow-sm">Upgrade to Pro</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="py-5 bg-white border-top border-slate-200">
+    <div class="container px-5 py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0 pe-lg-5">
+                <h6 class="text-info fw-bold text-uppercase tracking-wider mb-2">About Us</h6>
+                <h2 class="fw-bold text-slate-900 mb-4">Building the Future of Legal Tech</h2>
+                <p class="lead text-slate-600 mb-4 lh-lg">
+                    The LexAI project was conceived to democratize access to legal understanding. We believe that state-of-the-art artificial intelligence can bridge the gap between complex legal jargon and clear, actionable insights.
+                </p>
+                <p class="text-slate-500 mb-4 lh-lg">
+                    By combining secure document retrieval (RAG) with precision-tuned large language models, LexAI acts as a tireless first-pass reviewer, accelerating workflows and minimizing risks.
+                </p>
+                <button class="btn btn-outline-slate text-slate-900 mt-2 px-4 py-2 fw-medium" id="btn-team-reveal">Meet the Developers</button>
+            </div>
+            <div class="col-lg-6">
+                <!-- Meet the Team (Hidden by Default, triggered by button) -->
+                <div id="team-section" class="bg-slate-50 border border-slate-200 rounded p-4" style="display: none;">
+                    <h5 class="fw-bold text-slate-900 mb-4">The LexAI Team</h5>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="bg-white p-3 border border-slate-200 rounded shadow-sm">
+                                <h6 class="fw-bold mb-0 text-slate-800">Rohan Bongane</h6>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-white p-3 border border-slate-200 rounded shadow-sm">
+                                <h6 class="fw-bold mb-0 text-slate-800">Harsh Jha</h6>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-white p-3 border border-slate-200 rounded shadow-sm">
+                                <h6 class="fw-bold mb-0 text-slate-800">Aishwariya Bhunia</h6>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-white p-3 border border-slate-200 rounded shadow-sm">
+                                <h6 class="fw-bold mb-0 text-slate-800">Nitu Sharma</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const teamBtn = document.getElementById('btn-team-reveal');
+        const learnMoreBtn = document.getElementById('btn-learn-more');
+        const teamSection = document.getElementById('team-section');
+        
+        function revealTeam(e) {
+            if (e) e.preventDefault();
+            if (teamSection.style.display === 'none') {
+                teamSection.style.display = 'block';
+                teamSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (e && e.target === teamBtn) {
+                teamSection.style.display = 'none';
+            } else if (e && e.target.closest('#btn-learn-more')) {
+                teamSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        if(teamBtn && teamSection) {
+            teamBtn.addEventListener('click', revealTeam);
+        }
+        if(learnMoreBtn && teamSection) {
+            learnMoreBtn.addEventListener('click', revealTeam);
+        }
+    });
+</script>
+{% endblock %}

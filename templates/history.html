@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}My Documents{% endblock %}
+{% block page_title %}Documents / My Documents{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h2 class="fw-bold"><i class="bi bi-folder2-open text-warning me-2"></i>My Documents</h2>
+        <p class="text-muted mb-0">Manage and chat with your uploaded legal documents.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{{ url_for('document.upload') }}" class="btn btn-primary shadow-sm"><i class="bi bi-plus-lg me-2"></i>New Upload</a>
+    </div>
+</div>
+
+{% if not documents %}
+<div class="card border-0 shadow-sm p-5 text-center bg-white mt-4">
+    <div class="text-muted mb-3">
+        <i class="bi bi-file-earmark-pdf display-4"></i>
+    </div>
+    <h5 class="fw-bold">No documents yet</h5>
+    <p class="text-muted">You haven't uploaded any documents to LexAI yet.</p>
+    <div>
+        <a href="{{ url_for('document.upload') }}" class="btn btn-primary"><i class="bi bi-cloud-arrow-up me-2"></i>Upload your first document</a>
+    </div>
+</div>
+{% else %}
+<div class="row g-4">
+    {% for doc in documents %}
+    <div class="col-md-6 col-lg-4 col-xl-3">
+        <div class="card h-100 card-hover border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="badge bg-light text-dark border"><i class="bi bi-filetype-{{ doc.file_type }} me-1"></i>{{ doc.file_type | upper }}</span>
+                    {% if doc.status == 'completed' %}
+                        <span class="badge bg-success bg-opacity-10 text-success"><i class="bi bi-check-circle me-1"></i>Ready</span>
+                    {% else %}
+                        <span class="badge bg-warning bg-opacity-10 text-warning">Processing</span>
+                    {% endif %}
+                </div>
+                
+                <h5 class="card-title text-truncate fw-bold mb-2" title="{{ doc.original_filename }}">{{ doc.original_filename }}</h5>
+                
+                <div class="text-muted small mb-3">
+                    <div class="mb-1"><i class="bi bi-file-text me-2"></i>{{ doc.page_count }} Pages</div>
+                    <div class="mb-1"><i class="bi bi-body-text me-2"></i>{{ doc.word_count }} Words</div>
+                    <div><i class="bi bi-calendar3 me-2"></i>{{ doc.uploaded_at.strftime('%b %d, %Y') }}</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top p-3">
+                <div class="d-grid gap-2">
+                    <div class="d-flex gap-2">
+                        {% if doc.analysis %}
+                            <a href="{{ url_for('document.analysis', document_id=doc.id) }}" class="btn btn-sm btn-outline-secondary w-100">Analysis</a>
+                        {% elif doc.status == 'completed' and doc.extracted_text %}
+                            <form action="{{ url_for('document.analyze', document_id=doc.id) }}" method="POST" class="w-100">
+                                <button type="submit" class="btn btn-sm btn-outline-primary w-100">Analyze</button>
+                            </form>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('chat.chat_ui') }}?mode=document&doc={{ doc.id }}" class="btn btn-sm btn-primary w-100">Chat</a>
+                    </div>
+                    
+                    <form action="{{ url_for('document.delete', document_id=doc.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this document?');">
+                        <button type="submit" class="btn btn-sm btn-light text-danger w-100 border"><i class="bi bi-trash me-1"></i>Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
