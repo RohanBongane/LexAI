@@ -129,6 +129,7 @@ def kb_add():
     db.session.commit()
 
     success = index_kb_entry(new_kb.id, title, category, content, source)
+    
     if success:
         flash('Knowledge Base entry added and indexed successfully.', 'success')
     else:
