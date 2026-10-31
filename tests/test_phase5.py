@@ -60,6 +60,40 @@ def test_admin_dashboard_admin_allowed(client):
     login_client(client, 'admin@lexai.com')
     res = client.get('/admin/')
     assert res.status_code == 200
+    assert b'admin@lexai.com' in res.data
+    assert b'user@lexai.com' in res.data
+    assert b'Admin User' in res.data
+    assert b'Normal User' in res.data
+
+
+def test_admin_users_endpoint_renders_and_json(client):
+    login_client(client, 'admin@lexai.com')
+    # HTML response
+    res = client.get('/admin/users')
+    assert res.status_code == 200
+    assert b'admin@lexai.com' in res.data
+    assert b'user@lexai.com' in res.data
+
+    # JSON response
+    res_json = client.get('/admin/users', headers={'Accept': 'application/json'})
+    assert res_json.status_code == 200
+    data = res_json.get_json()
+    assert isinstance(data, list)
+    assert len(data) >= 2
+    emails = [u['email'] for u in data]
+    assert 'admin@lexai.com' in emails
+    assert 'user@lexai.com' in emails
+
+
+def test_admin_users_unauthenticated_and_normal_user_blocked(client):
+    # Unauthenticated
+    res = client.get('/admin/users')
+    assert res.status_code == 302
+
+    # Normal user
+    login_client(client, 'user@lexai.com')
+    res = client.get('/admin/users')
+    assert res.status_code == 302
 
 
 # ─── Last Admin Constraints ───────────────────────────────────────────────────

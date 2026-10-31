@@ -18,11 +18,12 @@
                 <div class="fw-bold">Document Chat</div>
                 <div class="small text-muted">Your Files</div>
             </div>
-            <a href="{{ url_for('main.knowledge_base') }}" class="chat-mode-card text-decoration-none text-dark">
-                <i class="bi bi-book fs-4 mb-2"></i>
-                <div class="fw-bold">Knowledge Base</div>
-                <div class="small text-muted">Browse Articles</div>
-            </a>
+<a href="{{ url_for('chat.chat_history') }}"
+   class="chat-mode-card text-decoration-none text-dark">    <i class="bi bi-clock-history fs-4 mb-2"></i>
+    <div class="fw-bold">Chat History</div>
+    <div class="small text-muted">Saved Conversations</div>
+</a>
+
         </div>
         
         <!-- Document Selector (Only visible in Document Mode) -->
@@ -70,6 +71,46 @@
                 <i class="bi bi-send-fill"></i>
             </button>
         </form>
+    </div>
+</div>
+
+<!-- Animated AI Answer Popup -->
+<div class="lexai-answer-overlay" id="answer-popup" aria-hidden="true">
+    <div class="lexai-answer-modal" role="dialog"
+         aria-modal="true" aria-labelledby="answer-popup-title">
+
+        <div class="lexai-answer-header">
+            <div class="lexai-answer-heading">
+                <i class="bi bi-robot"></i>
+                <div>
+                    <h4 id="answer-popup-title">LexAI Answer</h4>
+                    <small>AI-generated response</small>
+                </div>
+            </div>
+            <button type="button" id="close-answer-popup"
+                    class="lexai-popup-close" aria-label="Close answer">
+                &times;
+            </button>
+        </div>
+
+        <div class="lexai-answer-body" id="answer-popup-content"></div>
+
+        <div class="lexai-answer-footer">
+            <span class="small text-muted">
+                <i class="bi bi-info-circle"></i>
+                Review AI-generated information carefully.
+            </span>
+            <div class="d-flex gap-2">
+                <button type="button" id="copy-answer-popup"
+                        class="btn btn-outline-primary">
+                    <i class="bi bi-clipboard"></i> Copy Answer
+                </button>
+                <button type="button" id="close-answer-popup-bottom"
+                        class="btn btn-primary">
+                    Close
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 

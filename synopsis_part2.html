@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page { size: A4; margin: 1in; }
+        body {
+            font-family: "Bookman Old Style", serif; font-size: 12pt;
+            line-height: 1.5; color: black; text-align: justify;
+            margin: 0; padding: 0;
+        }
+        .page-border {
+            position: fixed; top: -0.5in; left: -0.5in; right: -0.5in; bottom: -0.5in;
+            border: 1px solid black; z-index: -100; pointer-events: none;
+        }
+        h2, h3 { font-size: 12pt; font-weight: bold; margin-top: 0; margin-bottom: 12px; }
+        p { margin-bottom: 12px; margin-top: 0; }
+        ul { margin-top: 0; margin-bottom: 12px; padding-left: 20px; }
+        li { margin-bottom: 6px; }
+        .main-section { page-break-before: always; }
+        .main-section:first-of-type { page-break-before: auto; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 10pt; }
+        th, td { border: 1px solid black; padding: 6px; text-align: left; }
+        th { font-weight: bold; }
+        .cover-page, .guide-page { page-break-after: always; }
+        .cover-page img { width: 1.5in; height: auto; margin: 20px 0; }
+        .cover-page p, .guide-page p { text-align: center; margin: 0; }
+        .bold { font-weight: bold; }
+        .signatures { width: 100%; margin-top: 60px; page-break-inside: avoid; border: none; }
+        .signatures td { border: none; padding: 0; }
+        .sig-right { text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="page-border"></div>
+
+    <div class="main-section">
+        <h2>1. Introduction</h2>
+        <p>The legal domain is characterized by densely packed terminology and lengthy documents, creating significant barriers for individuals and small businesses. Contracts and terms of service are often obfuscated by specialized jargon, making it difficult for non-lawyers to comprehend their rights, obligations, and hidden risks.</p>
+        <p>Manually reviewing these documents requires immense cognitive effort and frequently necessitates consulting legal professionals. The high cost of legal counsel often leads to contracts being signed without a full understanding of their implications. There is a pressing need for automated tools that can democratize access to basic legal comprehension.</p>
+        <p>LexAI is an AI-assisted legal information platform designed to bridge this gap. Utilizing a Flask-based web architecture, LexAI allows users to securely upload legal contracts (PDF or DOCX). The platform extracts and processes text to perform semantic analysis, providing executive summaries and identifying critical clauses.</p>
+        <p>To mitigate the "hallucination" risks associated with generative models, LexAI implements a Retrieval-Augmented Generation (RAG) architecture using the Google Gemini LLM. Grounding responses exclusively in the retrieved text of the user's specific document or a curated Knowledge Base helps reduce the likelihood of inaccurate claims. While LexAI assists in comprehension, it does not replace professional legal advice and acts primarily as an informational tool to aid preliminary review.</p>
+    </div>
+
+    <div class="main-section">
+        <h2>2. Literature Review</h2>
+        <p>Jain et al. [1] highlight the complexities of summarizing legal documents, emphasizing the necessity of preserving factual integrity. Traditional extractive methods miss semantic nuance, while abstractive generative models risk fabricating legal precedent. LexAI adopts a deterministic chunking strategy prior to abstraction to generate verifiable summaries.</p>
+        <p>Chalkidis et al. [2] demonstrated with LEGAL-BERT that generic language models frequently misinterpret legal nuances, necessitating domain-aware processing. LexAI addresses this by combining the efficient all-MiniLM-L6-v2 embedding model with strict JSON-schema prompting via the Gemini LLM to enforce analytical constraints.</p>
+        <p>Lewis et al. [3] established Retrieval-Augmented Generation (RAG) as a standard for knowledge-intensive NLP tasks, proving that querying an external vector index reduces factual hallucinations. LexAI incorporates this by utilizing ChromaDB as a semantic vector store, ensuring the AI processes text explicitly present in the uploaded document.</p>
+        <p>Surveys by Ariai et al. [4] and Martinez-Gil [5] underscore challenges in legal QA systems concerning privacy and trust. Public generative AI interfaces pose security risks for confidential contracts, and unconstrained models may hallucinate standard practices instead of citing negotiated terms.</p>
+        <h2>Research Gap</h2>
+        <p>While existing literature supports RAG in controlled settings, there is a gap in accessible systems that combine private document analysis with a securely isolated environment. LexAI addresses this by enforcing database-level filtering (document ID isolation), ensuring users only query their private contracts safely.</p>
+    </div>
+
+    <div class="main-section">
+        <h2>3. Aims & Objective</h2>
+        <p>The primary aim of LexAI is to develop a secure, accessible web-based platform that utilizes Artificial Intelligence and RAG to demystify complex legal documents.</p>
+        <p>Implemented Objectives:</p>
+        <ul>
+            <li><strong>User Authentication & Security:</strong> Develop secure registration and session management using Flask-Login and Bcrypt.</li>
+            <li><strong>Document Processing:</strong> Enable secure upload and raw text extraction from PDF/DOCX using PyMuPDF and python-docx.</li>
+            <li><strong>AI Legal Analysis:</strong> Engineer JSON prompts that constrain the Gemini API to generate executive summaries and highlight key clauses.</li>
+            <li><strong>RAG-Based Retrieval:</strong> Implement a vector embedding pipeline using SentenceTransformers and ChromaDB.</li>
+            <li><strong>Secure Isolation:</strong> Enforce database filtering so users can only access their own private documents.</li>
+            <li><strong>Document Chatbot:</strong> Create a conversational interface for users to query their specific uploaded contracts.</li>
+            <li><strong>Knowledge Base:</strong> Provide an admin-curated Knowledge Base for general legal queries.</li>
+            <li><strong>Deterministic Fallback:</strong> Implement a robust parser to handle external API failures by formatting local content.</li>
+        </ul>
+        <p>Future Objectives (Planned):</p>
+        <ul>
+            <li><strong>Optical Character Recognition (OCR):</strong> Process scanned, image-based legal documents lacking embedded text.</li>
+            <li><strong>Cloud Migration:</strong> Migrate local ChromaDB and file storage to persistent cloud infrastructure.</li>
+        </ul>
+    </div>
+
+    <div class="main-section">
+        <h2>4. Problem Definition</h2>
+        <p>The legal ecosystem remains largely inaccessible to the general public and small enterprises due to the volume and complexity of legal text. When an individual faces a standard contract, they encounter several immediate challenges:</p>
+        <p class="bold">Manual Review Effort</p>
+        <p>Contracts are often filled with repetitive boilerplate text and complex formatting. Reading these documents requires significant time. For many, this effort leads to signing documents without thorough review.</p>
+        <p class="bold">Obfuscated Clauses and Hidden Risks</p>
+        <p>Critical obligations, termination conditions, and liability waivers are frequently buried within archaic terminology. Identifying these risks without training is highly error-prone, carrying potential financial implications.</p>
+        <p class="bold">Information Retrieval Friction</p>
+        <p>Finding specific clauses (e.g., late payment penalties) in a massive document is tedious. Traditional keyword search often fails if the user does not guess the exact terminology used by the drafting lawyer.</p>
+        <p class="bold">Unreliable Public AI Solutions</p>
+        <p>While public generative AI chatbots are available, they provide generic, ungrounded responses. Furthermore, pasting confidential contracts into public interfaces poses severe privacy and compliance risks.</p>
+    </div>
+
+    <div class="main-section">
+        <h2>5. Proposed Model</h2>
+        <p>LexAI addresses the aforementioned problems by proposing a secure, decoupled client-server architecture. This model ensures that documents are processed locally into a vector database, and an LLM is strictly constrained via RAG to answer questions based only on the user's uploaded text or the curated Knowledge Base.</p>
+        
+        <h3>5.1 System Architecture Overview</h3>
+        <p>The system follows a modular architecture separating the user interface, backend orchestration, data storage, and external AI services. The data flow proceeds as follows:</p>
+        <p style="text-align: center; font-style: italic;" class="bold">User ➔ Web Interface ➔ Flask Backend ➔ Authentication and Document Processing ➔ MySQL / Local File Storage / ChromaDB ➔ Gemini API ➔ Response to User</p>
+        
+        <h3>5.2 Frontend Application</h3>
+        <p>The presentation layer is built utilizing HTML5, CSS3, and JavaScript, with Bootstrap 5 ensuring a responsive layout across devices. It handles user authentication forms, document uploads, and asynchronous chat interactions. To securely render AI-generated Markdown responses, the frontend employs marked.js for formatting and DOMPurify to sanitize outputs against Cross-Site Scripting (XSS) vulnerabilities.</p>
+        
+        <h3>5.3 Backend Processing Layer</h3>
+        <p>A Python-based Flask application serves as the core backend orchestration layer. It is responsible for routing HTTP requests, managing user sessions, processing uploaded documents, executing retrieval logic, and handling communication with the external Gemini API. This layer acts as a secure intermediary, ensuring that raw data is processed before any AI integration occurs.</p>
+        
+        <h3>5.4 Relational Database and File Storage</h3>
+        <p>MySQL, managed via Flask-SQLAlchemy, acts as the primary relational database. It stores securely hashed user credentials, document metadata (such as file paths and upload timestamps), generated executive summaries, and chat conversation histories. Uploaded PDF and DOCX files are stored directly on the local server file system in isolated, user-specific directories.</p>
+        
+        <h3>5.5 Semantic Vector Storage</h3>
+        <p>To enable semantic search, extracted document text is processed by a local SentenceTransformers model (all-MiniLM-L6-v2) to generate mathematical embeddings. These vectors, along with document chunk metadata, are indexed in ChromaDB, an open-source embedding database optimized for local RAG pipelines.</p>
+        
+        <h3>5.6 AI Analysis and RAG Integration</h3>
+        <p>When a query is made, the retrieved text chunks from ChromaDB are supplied to the Google Gemini API. The API is constrained by structured system prompts to generate contextual answers or executive summaries grounded solely in the provided text. The architecture strictly separates Document-Specific Chat (querying private uploads) from the General Legal Knowledge Base (querying an admin-curated repository).</p>
+        
+        <h3>5.7 Security and Reliability</h3>
+        <p>Security is enforced at multiple levels. Authentication relies on Flask-Login and Bcrypt password hashing. ChromaDB queries are explicitly filtered by user ID and document ID to prevent cross-contamination of private data. While these mechanisms aim to minimize unauthorized access and reduce AI hallucinations, the system relies on a deterministic fallback parser to maintain baseline functionality if the external Gemini API becomes temporarily unavailable.</p>
+    </div>
+
+    <div class="main-section">
+        <h2>6. Methodology</h2>
+        <p>The operational methodology of LexAI is structured into a chronological processing pipeline, transforming raw document uploads into interactive, semantically searchable data.</p>
+        
+        <h3>6.1 User Registration and Authentication</h3>
+        <p>Users initiate their session by registering an account. Passwords are mathematically salted and hashed using the Bcrypt algorithm before database insertion. The Flask-Login extension manages secure, HTTP-only session cookies, verifying user identity during subsequent requests and preventing unauthorized access to protected routes.</p>
+        
+        <h3>6.2 Document Upload and Validation</h3>
+        <p>Authenticated users upload legal contracts in PDF or DOCX formats via a secure multipart form. The backend strictly validates the file extension and MIME type to reject malicious payloads. Validated files are saved to the local filesystem within a designated upload directory.</p>
+        
+        <h3>6.3 Text Extraction</h3>
+        <p>The system invokes PyMuPDF to parse PDF files and python-docx for Word documents. These libraries extract pure unicode text while discarding visual formatting. Currently, the methodology relies on embedded text layers; scanned, image-based PDFs cannot be fully processed as Optical Character Recognition (OCR) is not yet implemented.</p>
+        
+        <h3>6.4 Text Preprocessing and Chunking</h3>
+        <p>Because Large Language Models are constrained by token limits, the extracted text is divided into smaller, manageable chunks. To ensure that continuous legal clauses are not arbitrarily split, the algorithm utilizes overlapping windows (e.g., a short overlap between consecutive chunks). This preserves the semantic context across chunk boundaries.</p>
+        
+        <h3>6.5 Embedding Generation and Vector Indexing</h3>
+        <p>Each text chunk is passed through the local all-MiniLM-L6-v2 SentenceTransformers model to generate a high-dimensional mathematical vector. These vectors are ingested into ChromaDB. Crucially, each vector is appended with metadata containing the specific document ID and user ID to ensure strict indexing.</p>
+        
+        <h3>6.6 Semantic Retrieval</h3>
+        <p>During a chat interaction, the user's natural language question is converted into an embedding using the identical SentenceTransformers model. ChromaDB performs a cosine similarity search between the question vector and the indexed document chunks. The retrieval is strictly filtered by the authenticated user's ID, returning only the most relevant chunks.</p>
+        
+        <h3>6.7 AI-Based Document Analysis</h3>
+        <p>For automated analysis, the retrieved document content is supplied to the Gemini API alongside a restrictive JSON-schema prompt. The prompt instructs the model to extract key clauses, summarize obligations, and identify potential risks based exclusively on the provided text, returning a structured summary for the user dashboard.</p>
+        
+        <h3>6.8 Document-Specific Chat and General Legal Chat</h3>
+        <p>The methodology employs two distinct retrieval paths. The Document-Specific Chat filters vector searches exclusively against the user's private uploaded file. Conversely, the General Legal Chat bypasses user documents entirely, querying a separate ChromaDB collection populated only with an administrator-curated Knowledge Base, ensuring private data is never mixed with general inquiries.</p>
+        
+        <h3>6.9 Fallback and Error Handling</h3>
+        <p>In the event of a Gemini API outage (e.g., quota limits or network errors), a deterministic Python fallback mechanism is triggered for Knowledge Base queries. This parser bypasses the LLM entirely, retrieving the most relevant raw text chunks from ChromaDB, formatting them into Markdown, and presenting them directly to the user to maintain system availability.</p>
+        
+        <h3>6.10 Testing and Validation</h3>
+        <p>System reliability is verified using the Pytest framework. The testing methodology includes unit tests for the authentication flows, ensuring registration validations and login route protections function correctly. Database isolation tests verify that users cannot access records or vectors belonging to other accounts, utilizing separate test databases to prevent corruption of production data.</p>
+    </div>
+
+    <div class="main-section">
+        <h2>7. Plan of Work</h2>
+        <p>The development of LexAI was executed in sequential phases, prioritizing core infrastructure and security before integrating advanced artificial intelligence components. The structured timeline and outcomes are detailed below.</p>
+        
+        <table>
+            <tr>
+                <th>Phase</th>
+                <th>Development Activity</th>
+                <th>Tools / Technologies</th>
+                <th>Status</th>
+                <th>Expected Outcome</th>
+            </tr>
+            <tr>
+                <td>Phase 1</td>
+                <td>Project setup and authentication.</td>
+                <td>Flask, MySQL, Bcrypt, Flask-Login</td>
+                <td>Implemented</td>
+                <td>Secure user accounts and isolated sessions.</td>
+            </tr>
+            <tr>
+                <td>Phase 2</td>
+                <td>Document upload and text extraction.</td>
+                <td>PyMuPDF, python-docx, werkzeug</td>
+                <td>Implemented</td>
+                <td>Reliable ingestion of raw text from PDF and DOCX files.</td>
+            </tr>
+            <tr>
+                <td>Phase 3</td>
+                <td>AI-powered legal document analysis.</td>
+                <td>Google Gemini API, JSON-Schema</td>
+                <td>Implemented</td>
+                <td>Automated generation of structured executive summaries.</td>
+            </tr>
+            <tr>
+                <td>Phase 4</td>
+                <td>RAG pipeline and document chat.</td>
+                <td>SentenceTransformers, ChromaDB, AJAX</td>
+                <td>Implemented</td>
+                <td>Semantic search enabling context-aware chat interaction.</td>
+            </tr>
+            <tr>
+                <td>Phase 5</td>
+                <td>Knowledge Base, fallback mechanism, and testing.</td>
+                <td>Flask, Pytest, Python Parsers</td>
+                <td>Implemented</td>
+                <td>Curated legal chat and resilient external API error handling.</td>
+            </tr>
+            <tr>
+                <td>Phase 6</td>
+                <td>OCR support for scanned documents.</td>
+                <td>Tesseract OCR, Vision APIs</td>
+                <td>Future Scope</td>
+                <td>Ability to analyze image-based PDFs lacking text layers.</td>
+            </tr>
+            <tr>
+                <td>Phase 7</td>
+                <td>Multilingual support or cloud deployment.</td>
+                <td>Translation Pipelines, AWS S3</td>
+                <td>Future Scope</td>
+                <td>Scalable enterprise deployment and broader language accessibility.</td>
+            </tr>
+        </table>
+        
+        <p>These phases build logically upon one another; foundational authentication and file handling (Phases 1 and 2) were strict prerequisites for the RAG pipeline (Phases 3 and 4). Future enhancements, such as OCR and cloud migration (Phases 6 and 7), will extend the system's capabilities without disrupting the core architecture established in the implemented phases.</p>
+    </div>
+
+    <div class="main-section">
+        <h2>8. Conclusion</h2>
+        <p>The LexAI project successfully addresses the significant accessibility barrier posed by dense legal terminology and lengthy contracts. By developing a secure, web-based platform that automates the extraction and semantic analysis of legal documents, the system provides individuals and small enterprises with a practical tool for preliminary contract review. The integration of local vector indexing with Retrieval-Augmented Generation (RAG) ensures that the artificial intelligence is firmly grounded in the user's actual document, aiming to minimize the likelihood of hallucinatory or inaccurate responses.</p>
+        <p>A critical achievement of the project is the robust implementation of two distinct conversational interfaces. The Document-Specific Chat allows users to interrogate their private uploads securely, enforced by strict database-level filtering that isolates user data. Simultaneously, the General Legal Knowledge Base provides access to curated legal concepts without cross-contaminating private records. Furthermore, the inclusion of a deterministic fallback mechanism ensures that the platform maintains baseline functionality and provides uninterrupted access to its curated repository even during external API outages.</p>
+        <p>Despite these advancements, LexAI possesses acknowledged limitations. The current text extraction methodology relies on embedded text layers; therefore, scanned or image-based documents cannot be processed, as Optical Character Recognition (OCR) is not yet implemented. Additionally, the system currently lacks multilingual capabilities, and while RAG significantly reduces factual errors, it does not completely eliminate the risk of AI inaccuracy. LexAI is explicitly designed as an informational assistant and does not replace the necessity for qualified legal professionals.</p>
+        <p>Future improvements will focus on expanding the platform's accessibility and scalability. The planned integration of OCR will allow for the processing of legacy scanned contracts, while multilingual support would democratize legal comprehension across broader demographics. Ultimately, LexAI represents a functional, verifiable prototype that makes significant practical contributions toward rendering complex legal information transparent and accessible.</p>
+    </div>
+
+    <div class="main-section">
+        <h2>9. References</h2>
+        <p>[1] Jain, D., Borah, M. D., & Biswas, A. (2021). "Summarization of legal documents: Where are we now and the way forward." <span class="bold">Computer Science Review</span>, 40, 100388.</p>
+        <p>[2] Chalkidis, I., Fergadiotis, M., Malakasiotis, P., Aletras, N., & Androutsopoulos, I. (2020). "LEGAL-BERT: The Muppets straight out of Law School." <span class="bold">Findings of the Association for Computational Linguistics: EMNLP 2020</span>.</p>
+        <p>[3] Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., ... & Riedel, S. (2020). "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks." <span class="bold">Advances in Neural Information Processing Systems (NeurIPS)</span>.</p>
+        <p>[4] Ariai, F., Mackenzie, J., & Demartini, G. (2025). "Natural Language Processing for the Legal Domain: A Survey of Tasks, Datasets, Models, and Challenges." <span class="bold">ACM Computing Surveys</span>, 58(6).</p>
+        <p>[5] Martinez-Gil, J. (2023). "A survey on legal question–answering systems." <span class="bold">Computer Science Review</span>, 48, 100551.</p>
+        
+        <table class="signatures">
+            <tr>
+                <td class="sig-left">
+                    <p class="bold">Prof. Dr. Surekha Kohle</p>
+                    <p>Guide</p>
+                    <p>CS/IT Department</p>
+                </td>
+                <td class="sig-right">
+                    <p class="bold">Dr. Praveen Gupta</p>
+                    <p>H.O.D.</p>
+                    <p>CS/IT Department</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body></html>

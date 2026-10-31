@@ -1,24 +1,60 @@
+# Environment and secrets
 .env
+.env.*
+!.env.example
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
 .venv/
 venv/
 env/
-__pycache__/
-*.pyc
-.pytest_cache/
+ENV/
+
+# Application data & persistent storage (must never be committed to Git)
+uploads/
 chroma_db/
 chroma_db_test/
-uploads/
-*.log
+instance/
 *.sqlite
+*.sqlite3
 *.db
+
+# Vercel CLI build output
+.vercel/
+
+# Logs
+*.log
+flask_error.log
+startup.log
+
+# Operating system and IDE metadata
+.DS_Store
+Thumbs.db
 .vscode/
 .idea/
-.DS_Store
-LexAI_Project_Handover_Technical_Documentation.pdf
-handover.html
-generate_docs.py
-make_pdf.py
+*.swp
+*~
 
+# Temporary artifacts and scratch files
 scratch/
 test.js
 test_rag_local.py
+test_app_init.py
+run_audit_scan.py
+backup_*.zip
+pdf_preview_pages/
+LexAI/
+check_blocks.py
+verify_pdf.py
+page_breakdown.py
+render_pages.py
+extracted_original_text.txt
+

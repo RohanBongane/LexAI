@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; line-height: 1.6; color: #333; max-width: 1000px; margin: 0 auto; padding: 40px; font-size: 14px; }
+    h1 { font-size: 2.2em; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 1.5em; page-break-after: avoid; }
+    h2 { font-size: 1.5em; color: #2980b9; margin-top: 1.2em; page-break-after: avoid; }
+    h3 { font-size: 1.2em; color: #34495e; page-break-after: avoid; }
+    p, li { margin-bottom: 10px; }
+    a { color: #3498db; text-decoration: none; }
+    .cover-page { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+    .cover-title { font-size: 4em; color: #2c3e50; font-weight: bold; margin-bottom: 10px; letter-spacing: 2px; border-bottom: 4px solid #3498db; padding-bottom: 10px; display: inline-block; }
+    .cover-subtitle { font-size: 1.8em; color: #7f8c8d; margin-bottom: 40px; font-weight: 500; }
+    .cover-meta { font-size: 1.2em; color: #95a5a6; line-height: 2; padding: 20px; border: 1px solid #eee; border-radius: 10px; background: #fdfdfd; }
+    .page-break { page-break-before: always; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; page-break-inside: avoid; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #f8f9fa; font-weight: 600; color: #2c3e50; }
+    tr:nth-child(even) { background-color: #fcfcfc; }
+    pre { background: #f8f9fa; padding: 15px; overflow-x: auto; border: 1px solid #e1e4e8; border-radius: 5px; page-break-inside: avoid; }
+    code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9em; color: #e74c3c; }
+    pre code { color: #333; background: transparent; padding: 0; }
+    .alert { padding: 15px; border-left: 4px solid transparent; margin: 20px 0; border-radius: 0 4px 4px 0; page-break-inside: avoid; }
+    .alert-info { background: #e8f4f8; border-color: #3498db; color: #2c3e50; }
+    .alert-warning { background: #fff3cd; border-color: #f39c12; color: #8a6d3b; }
+    .mermaid { text-align: center; margin: 30px 0; }
+    ul, ol { padding-left: 25px; }
+    @media print {
+        body { padding: 0; max-width: 100%; }
+        .cover-page { height: 100vh; }
+        a { text-decoration: none !important; color: #333 !important; }
+    }
+</style>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</head>
+<body>
+<div class="cover-page">
+    <div class="cover-title">LEXAI</div>
+    <div class="cover-subtitle">AI-Powered Legal Assistant &<br>Contract Intelligence Platform</div>
+    <div class="cover-meta">
+        <br><br>
+        <strong>Project Handover & Technical Documentation</strong><br>
+        <strong>Version:</strong> 1.0<br>
+        <strong>Status:</strong> 86/86 Tests Passing<br>
+        <strong>Target Audience:</strong> MCA Final-Year Project Teammates
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<h1>Table of Contents</h1>
+<ol>
+<li><a href="#1-executive-project-overview">Executive Project Overview</a></li>
+<li><a href="#2-problem-statement">Problem Statement</a></li>
+<li><a href="#3-project-objectives">Project Objectives</a></li>
+<li><a href="#4-complete-feature-list">Complete Feature List</a></li>
+<li><a href="#5-technology-stack">Technology Stack</a></li>
+<li><a href="#6-technology-concepts-for-teammates">Technology Concepts for Teammates</a></li>
+<li><a href="#7-system-architecture">System Architecture</a></li>
+<li><a href="#8-complete-user-flow">Complete User Flow</a></li>
+<li><a href="#9-public-website-vs-application">Public Website vs Application</a></li>
+<li><a href="#10-folder-structure">Folder Structure</a></li>
+<li><a href="#11-file-by-file-responsibility">File-By-File Responsibility</a></li>
+<li><a href="#12-database-architecture">Database Architecture</a></li>
+<li><a href="#13-document-processing-pipeline">Document Processing Pipeline</a></li>
+<li><a href="#14-ai-legal-analysis-pipeline">AI Legal Analysis Pipeline</a></li>
+<li><a href="#15-rag-system-explained">RAG System Explained</a></li>
+<li><a href="#16-knowledge-base">Knowledge Base</a></li>
+<li><a href="#17-chat-system">Chat System</a></li>
+<li><a href="#18-authentication-security">Authentication &amp; Security</a></li>
+<li><a href="#19-error-handling">Error Handling</a></li>
+<li><a href="#20-testing">Testing</a></li>
+<li><a href="#21-project-development-phases">Project Development Phases</a></li>
+<li><a href="#22-current-project-status">Current Project Status</a></li>
+<li><a href="#23-gemini-api-quota">Gemini API / Quota</a></li>
+<li><a href="#24-environment-variables">Environment Variables</a></li>
+<li><a href="#25-how-to-setup-project-locally">How to Setup Project Locally</a></li>
+<li><a href="#26-how-to-run-the-project">How to Run the Project</a></li>
+<li><a href="#27-how-to-add-a-new-knowledge-base-article">How to Add a New Knowledge Base Article</a></li>
+<li><a href="#28-how-to-debug-common-problems">How to Debug Common Problems</a></li>
+<li><a href="#29-development-rules-for-teammates">Development Rules for Teammates</a></li>
+<li><a href="#30-project-limitations">Project Limitations</a></li>
+<li><a href="#31-future-scope">Future Scope</a></li>
+<li><a href="#32-team-handover-section">Team Handover Section</a></li>
+<li><a href="#33-glossary">Glossary</a></li>
+</ol>
+<div class="page-break"></div>
+
+<h1 id="1-executive-project-overview">1. Executive Project Overview</h1>
+
+<p><strong>What is LexAI?</strong><br />
+LexAI is an AI-assisted legal information and document intelligence platform. It allows users to upload complex legal contracts (PDF or DOCX), automatically extracts the text, and leverages Google's Gemini Large Language Model (LLM) to perform deep legal analysis, producing structured executive summaries and clause breakdowns.</p>
+<p><strong>What problem does it solve?</strong><br />
+Legal documents are notorious for being dense, lengthy, and filled with difficult jargon. Laypeople and legal professionals alike spend excessive time reviewing standard contracts to find obligations, liabilities, and core terms. Furthermore, accessing reliable general legal information often requires expensive consultations. LexAI automates the heavy lifting of document review and provides an instant, AI-driven knowledge base.</p>
+<p><strong>Who is it designed for?</strong><br />
+LexAI is designed for individuals reviewing personal contracts, small business owners examining vendor agreements, and law students or professionals who need a fast, AI-powered paralegal assistant to highlight key elements of a legal text.</p>
+<p><strong>What can a user do with it?</strong><br />
+Users can create an account, upload legal documents, view automated AI analyses of those documents, and interact with an AI Chatbot in two distinct modes:
+1. <strong>Document Chat:</strong> Ask specific questions about an uploaded contract (e.g., "What is the termination clause?").
+2. <strong>General Legal Chat:</strong> Ask broad legal questions which the AI answers by retrieving grounded information from the platform's trusted Knowledge Base.</p>
+<p><strong>Why is AI useful in this project?</strong><br />
+Traditional software can search for keywords, but only modern LLMs can understand the semantic meaning of a "force majeure" clause even if it's worded differently. AI enables the system to summarize, interpret, and answer natural language questions about dense text.</p>
+<div class="alert alert-info">
+<strong>Disclaimer (As implemented in the project):</strong><br>
+LexAI provides AI-generated information for educational and informational purposes only. It is <strong>NOT</strong> a replacement for a qualified lawyer and does not constitute professional legal advice. Laws vary by jurisdiction and circumstances.
+</div>
+
+<h1 id="2-problem-statement">2. Problem Statement</h1>
+
+<p>Navigating the legal landscape presents several distinct challenges that LexAI aims to mitigate:
+- <strong>Complexity and Length:</strong> Legal documents (contracts, terms of service, NDAs) are lengthy and difficult for non-lawyers to understand.
+- <strong>Hidden Risks:</strong> Users struggle to identify important clauses, rights, obligations, and potential liabilities buried in "legalese."
+- <strong>Time Consumption:</strong> Traditional document review requires significant manual effort and hours of reading.
+- <strong>Access to Information:</strong> Finding relevant, structured, and easy-to-understand legal information is time-consuming and often requires consulting expensive professionals.</p>
+<h1 id="3-project-objectives">3. Project Objectives</h1>
+
+<p>The core objectives of the LexAI project are defined below. </p>
+<p><strong>Implemented Objectives:</strong>
+- [x] Secure user authentication (registration, login, logout).
+- [x] Upload and parse legal documents (PDF and DOCX formats).
+- [x] Generate automated AI Legal Analyses (Executive Summary, Clause Breakdown).
+- [x] Provide a Retrieval-Augmented Generation (RAG) backend for natural language queries.
+- [x] Provide Document-based Chat (chatting with a specific uploaded file).
+- [x] Provide General Legal Chat grounded in a trusted Knowledge Base.
+- [x] Maintain secure user-specific document access and isolation.
+- [x] Maintain an Administrator system for managing the Knowledge Base.
+- [x] Handle AI API failures gracefully with deterministic fallback responses.</p>
+<p><strong>Planned / Future Objectives:</strong>
+- [ ] Multilingual legal support (Hindi, Marathi, etc.).
+- [ ] OCR for scanned/image-based legal documents.
+- [ ] Persistent cloud storage deployment (Firebase/AWS).</p>
+<h1 id="4-complete-feature-list">4. Complete Feature List</h1>
+
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th style="text-align: center;">Implemented?</th>
+<th>Main Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>Registration, Login, Logout, password hashing</td>
+<td style="text-align: center;">Yes</td>
+<td><code>routes/auth_routes.py</code></td>
+</tr>
+<tr>
+<td><strong>Dashboard</strong></td>
+<td>Overview of uploaded files and recent activity</td>
+<td style="text-align: center;">Yes</td>
+<td><code>routes/main_routes.py</code></td>
+</tr>
+<tr>
+<td><strong>Document Upload</strong></td>
+<td>Secure handling of <code>.pdf</code> and <code>.docx</code> uploads</td>
+<td style="text-align: center;">Yes</td>
+<td><code>routes/document_routes.py</code></td>
+</tr>
+<tr>
+<td><strong>PDF/DOCX Extraction</strong></td>
+<td>Text extraction using PyMuPDF and python-docx</td>
+<td style="text-align: center;">Yes</td>
+<td><code>services/document_service.py</code></td>
+</tr>
+<tr>
+<td><strong>Document Statistics</strong></td>
+<td>Calculating word, character, and page counts</td>
+<td style="text-align: center;">Yes</td>
+<td><code>services/document_service.py</code></td>
+</tr>
+<tr>
+<td><strong>AI Legal Analysis</strong></td>
+<td>Generating Executive Summaries via Gemini</td>
+<td style="text-align: center;">Yes</td>
+<td><code>routes/document_routes.py</code>, <code>ai_service.py</code></td>
+</tr>
+<tr>
+<td><strong>General Legal Chat</strong></td>
+<td>Chatbot answering general queries via KB</td>
+<td style="text-align: center;">Yes</td>
+<td><code>routes/chat_routes.py</code></td>
+</tr>
+<tr>
+<td><strong>Document Chat</strong></td>
+<td>Chatbot answering queries based on user doc</td>
+<td style="text-align: center;">Yes</td>
+<td><code>routes/chat_routes.py</code></td>
+</tr>
+<tr>
+<td><strong>RAG System</strong></td>
+<td>Vector similarity search for context injection</td>
+<td style="text-align: center;">Yes</td>
+<td><code>services/rag_service.py</code></td>
+</tr>
+<tr>
+<td><strong>Embeddings</strong></td>
+<td>Text chunking and embedding generation</td>
+<td style="text-align: center;">Yes</td>
+<td><code>services/embedding_service.py</code></td>
+</tr>
+<tr>
+<td><strong>Conversations &amp; Messages</strong></td>
+<td>Saving chat histories to the database</td>
+<td style="text-align: center;">Yes</td>
+<td><code>models/database_models.py</code></td>
+</tr>
+<tr>
+<td><strong>Admin Panel</strong></td>
+<td>Protected UI for administrators</td>
+<td style="text-align: center;">Yes</td>
+<td><code>routes/admin_routes.py</code></td>
+</tr>
+<tr>
+<td><strong>KB Management</strong></td>
+<td>Admin CRUD operations for Knowledge Base</td>
+<td style="text-align: center;">Yes</td>
+<td><code>routes/admin_routes.py</code></td>
+</tr>
+<tr>
+<td><strong>Markdown Rendering</strong></td>
+<td>Displaying AI output beautifully (with MathJax)</td>
+<td style="text-align: center;">Yes</td>
+<td><code>static/js/chatbot.js</code></td>
+</tr>
+<tr>
+<td><strong>DOMPurify</strong></td>
+<td>Sanitizing markdown to prevent XSS attacks</td>
+<td style="text-align: center;">Yes</td>
+<td><code>templates/chatbot.html</code></td>
+</tr>
+<tr>
+<td><strong>Gemini Fallback</strong></td>
+<td>Deterministic KB fallback when Gemini is 503/429</td>
+<td style="text-align: center;">Yes</td>
+<td><code>services/rag_service.py</code></td>
+</tr>
+<tr>
+<td><strong>Automated Testing</strong></td>
+<td>Comprehensive Pytest suite checking functionality</td>
+<td style="text-align: center;">Yes</td>
+<td><code>tests/</code></td>
+</tr>
+</tbody>
+</table>
+<div class="page-break"></div>
+
+<h1 id="5-technology-stack">5. Technology Stack</h1>
+
+<p>The LexAI project utilizes a modern Python-based web architecture.</p>
+<h3>Frontend</h3>
+<ul>
+<li><strong>HTML5 &amp; CSS3:</strong> Standard markup and styling.</li>
+<li><strong>JavaScript (Vanilla):</strong> Handles asynchronous chat requests, markdown rendering, and dynamic UI interactions without the overhead of heavy frameworks.</li>
+<li><strong>Bootstrap 5:</strong> Used for the responsive grid, pre-built UI components (cards, modals, sidebars), and consistent styling.</li>
+<li><strong>marked.js &amp; DOMPurify:</strong> Used to safely render Markdown responses (from Gemini) into HTML on the client side while preventing Cross-Site Scripting (XSS).</li>
+<li><strong>MathJax:</strong> Used to render complex mathematical/logical formulas (like contract equations) output by Gemini in LaTeX format.</li>
+</ul>
+<h3>Backend</h3>
+<ul>
+<li><strong>Python (3.x):</strong> The core programming language powering the backend logic.</li>
+<li><strong>Flask:</strong> A lightweight WSGI web application framework used to route HTTP requests, manage sessions, and render templates.</li>
+<li><strong>Flask-SQLAlchemy:</strong> An Object-Relational Mapper (ORM) that bridges Python objects and the MySQL database.</li>
+<li><strong>Flask-Login:</strong> Manages user sessions, login state, and role-based access control.</li>
+<li><strong>Flask-Bcrypt:</strong> Hashes user passwords securely using the bcrypt algorithm.</li>
+</ul>
+<h3>Database</h3>
+<ul>
+<li><strong>MySQL (via mysql-connector-python):</strong> The primary relational database storing users, documents metadata, analyses, chat histories, and knowledge base articles.</li>
+<li><strong>ChromaDB:</strong> A specialized, locally-hosted Vector Database used entirely for storing and retrieving high-dimensional text embeddings for the RAG system.</li>
+</ul>
+<h3>AI &amp; Machine Learning</h3>
+<ul>
+<li><strong>Google GenAI SDK (<code>google-genai</code>):</strong> Communicates with Google's Gemini API to generate intelligent text analysis and chatbot responses.</li>
+<li><strong>SentenceTransformers (<code>all-MiniLM-L6-v2</code>):</strong> A local NLP model used to convert text (document chunks and queries) into 384-dimensional vector embeddings for semantic similarity search.</li>
+</ul>
+<h3>Document Processing</h3>
+<ul>
+<li><strong>PyMuPDF (<code>fitz</code>):</strong> A high-performance library used to parse and extract raw text from PDF files.</li>
+<li><strong>python-docx:</strong> Used to parse and extract text from Microsoft Word (<code>.docx</code>) files.</li>
+</ul>
+<h3>Testing</h3>
+<ul>
+<li><strong>Pytest:</strong> The testing framework used to run the 86-test suite, ensuring routing, authentication, security, and RAG isolation behave as expected.</li>
+</ul>
+<h1 id="6-technology-concepts-for-teammates">6. Technology Concepts for Teammates</h1>
+
+<p>To successfully contribute to LexAI, teammates should understand these core concepts:</p>
+<h3>Flask</h3>
+<p>Flask is a web framework for Python. Instead of writing raw HTTP servers, Flask allows us to map URLs to Python functions using decorators (e.g., <code>@app.route('/dashboard')</code>). It handles incoming requests, manages cookies/sessions, and returns HTML templates.</p>
+<h3>MySQL &amp; Relational Databases</h3>
+<p>A relational database stores data in interconnected tables. LexAI uses MySQL to store structured metadata (like usernames, passwords, file paths, and conversation records). It ensures data integrity through relationships (e.g., a Document belongs to a User).</p>
+<h3>SQLAlchemy (ORM)</h3>
+<p>Writing raw SQL queries (like <code>SELECT * FROM users</code>) can be tedious and prone to SQL injection. SQLAlchemy allows us to interact with the database using Python objects (e.g., <code>User.query.all()</code>), automatically translating Python code into safe SQL queries behind the scenes.</p>
+<h3>Google Gemini API</h3>
+<p>Gemini is the Large Language Model (LLM) serving as the "brain" of LexAI. When a user uploads a contract, the backend extracts the text and sends it to Gemini via an API key, prompting it to summarize the text. API errors like <code>429</code> (Quota Reached) or <code>503</code> (Service Unavailable) happen when Google's servers are too busy.</p>
+<h3>ChromaDB &amp; Vector Databases</h3>
+<p>Traditional databases search by exact keyword matches. A vector database (like ChromaDB) searches by <em>meaning</em>. When we store a document, we convert it into numbers (vectors). When a user asks a question, we convert the question into numbers and find the document chunks mathematically closest in meaning to the question.</p>
+<h3>SentenceTransformers (<code>all-MiniLM-L6-v2</code>)</h3>
+<p>This is the specific AI model that does the conversion from text to numbers (embeddings). We run this locally on the server to avoid paying API costs for embedding generation. It creates a 384-dimensional vector for every chunk of text.</p>
+<h3>Retrieval-Augmented Generation (RAG)</h3>
+<p>LLMs like Gemini don't inherently know about a user's private contract, nor do they perfectly memorize specific Indian Contract Law. RAG fixes this:
+1. <strong>User Question:</strong> "What happens if they terminate early?"
+2. <strong>Search:</strong> We search ChromaDB for clauses regarding "early termination" in the user's uploaded document.
+3. <strong>Retrieve:</strong> ChromaDB returns the 3 most relevant paragraphs.
+4. <strong>Augment &amp; Generate:</strong> We send the question PLUS the retrieved paragraphs to Gemini, saying: "Answer the question USING ONLY this text."
+This guarantees accurate, grounded answers and prevents the AI from hallucinating.</p>
+<h3>PyMuPDF &amp; python-docx</h3>
+<p>These libraries open the binary <code>.pdf</code> and <code>.docx</code> files the user uploads and pull out raw text strings that our AI and embedding models can process.</p>
+<h3>marked.js + DOMPurify</h3>
+<p>Gemini returns responses formatted in Markdown (using <code>**bold**</code> and <code>### headings</code>). <code>marked.js</code> converts this to HTML so the browser can style it. However, directly inserting HTML into a webpage is dangerous (a hacker could inject malicious scripts). <code>DOMPurify</code> scrubs the HTML clean before we display it.</p>
+<div class="page-break"></div>
+
+<h1 id="7-system-architecture">7. System Architecture</h1>
+
+<div class="mermaid">
+graph TD
+    User([User / Browser])
+    User -->|HTTP Requests| Flask[Flask Application]
+
+    subgraph Backend [LexAI Backend]
+        Flask --> Auth[Authentication]
+        Flask --> DocMgr[Document Management]
+        Flask --> Chat[Chat & RAG System]
+        Flask --> Admin[Admin KB Management]
+    end
+
+    subgraph Databases [Data Layer]
+        Auth --> MySQL[(MySQL DB)]
+        DocMgr --> MySQL
+        Chat --> MySQL
+        Admin --> MySQL
+
+        DocMgr -.->|Store Extracted Text| Filesystem[Local Uploads Folder]
+        DocMgr -->|Embed & Store| Chroma[(ChromaDB Vector Store)]
+        Admin -->|Embed & Store| Chroma
+        Chat -->|Similarity Search| Chroma
+    end
+
+    subgraph External [External APIs]
+        Chat -->|Context + Query| Gemini((Google Gemini API))
+        DocMgr -->|Full Text| Gemini
+    end
+</div>
+
+<p><strong>Explanation:</strong>
+- The user interacts with the Frontend (HTML/JS), sending requests to the Flask Backend.
+- The Backend parses documents and stores the physical files on the filesystem, while metadata goes to MySQL.
+- Text is chunked and embedded using local models, storing vectors in ChromaDB.
+- When querying, the Chat System searches ChromaDB for context, then sends the context and the user query to the Google Gemini API to generate a response.</p>
+<h1 id="8-complete-user-flow">8. Complete User Flow</h1>
+
+<h3>Primary Application Journey</h3>
+<ol>
+<li><strong>Public Landing Page:</strong> Visitor lands on <code>/</code> and views the SaaS-style marketing page.</li>
+<li><strong>Authentication:</strong> User navigates to <code>/register</code> or <code>/login</code> and authenticates.</li>
+<li><strong>Dashboard:</strong> User lands on <code>/dashboard</code>, seeing a summary of their uploaded documents.</li>
+<li><strong>Document Upload:</strong> User navigates to the AI Analysis page and uploads a <code>.pdf</code> or <code>.docx</code>.</li>
+<li><strong>Processing:</strong> The backend validates the file, extracts text, calculates word/page counts, and chunks/embeds the text into ChromaDB.</li>
+<li><strong>Analysis Generation:</strong> The backend sends the full text (if within limits) to Gemini to generate an Executive Summary, which is stored in MySQL.</li>
+<li><strong>Document Chat:</strong> The user opens the Chat UI (<code>/chat</code>), selects the uploaded document, and asks a specific question. The RAG system isolates the search to <em>only</em> that document's vector chunks and generates an answer.</li>
+</ol>
+<h3>General Legal Chat Journey</h3>
+<ol>
+<li>The user goes to <code>/chat</code> and selects "General Legal".</li>
+<li>The user asks "What is a voidable contract?".</li>
+<li>The RAG system searches ChromaDB filtering strictly for <code>source_type: knowledge_base</code>.</li>
+<li>It retrieves matching legal concepts curated by the Admin.</li>
+<li>Gemini uses those concepts to formulate a highly accurate legal answer. (If Gemini is down, the deterministic fallback parser kicks in to present the KB data cleanly).</li>
+</ol>
+<h1 id="9-public-website-vs-application">9. Public Website vs Application</h1>
+
+<p>LexAI maintains a strict architectural and visual separation between the public-facing marketing site and the authenticated application dashboard.</p>
+<p><strong>PUBLIC WEBSITE</strong>
+- <strong>Route:</strong> <code>/</code> (handled by <code>main_routes.py</code>)
+- <strong>Template:</strong> <code>index.html</code> extending <code>public_base.html</code>
+- <strong>Purpose:</strong> Marketing, branding, feature highlights.
+- <strong>UI:</strong> No sidebars. Standalone SaaS-style navigation.</p>
+<p><strong>AUTHENTICATED APPLICATION</strong>
+- <strong>Routes:</strong> <code>/dashboard</code>, <code>/chat</code>, <code>/documents</code>, <code>/admin</code>, etc.
+- <strong>Template:</strong> Various, all extending <code>base.html</code>
+- <strong>Purpose:</strong> Actual functionality (uploading, chatting).
+- <strong>UI:</strong> Features a persistent left-hand navigation sidebar, user profile dropdowns, and protected route access.</p>
+<div class="page-break"></div>
+
+<h1 id="10-folder-structure">10. Folder Structure</h1>
+
+<p>The following represents the ACTUAL structure of the LexAI project codebase:</p>
+<p><code>text
+LexAI/
+├── .env.example             # Template for required environment variables
+├── app.py                   # Flask application factory and registration
+├── config.py                # Configuration classes (Dev, Test, Prod)
+├── init_db.py               # Script to initialize SQLAlchemy models
+├── requirements.txt         # Python dependencies
+├── setup_db.py              # Script to manually configure MySQL DBs
+│
+├── models/
+│   └── database_models.py   # SQLAlchemy definitions (User, Document, etc.)
+│
+├── routes/
+│   ├── admin_routes.py      # Admin dashboard and KB CRUD routes
+│   ├── auth_routes.py       # Login, Register, Logout
+│   ├── chat_routes.py       # API routes for General and Document chat
+│   ├── document_routes.py   # Upload, Analysis, Document History
+│   └── main_routes.py       # Public landing page, Dashboard, Profile
+│
+├── scripts/
+│   └── seed_kb.py           # Script to populate Knowledge Base with vectors
+│
+├── services/
+│   ├── document_service.py  # PDF/DOCX parsing, validation, stats
+│   ├── embedding_service.py # Chunking logic, SentenceTransformers
+│   └── rag_service.py       # ChromaDB retrieval, Fallback logic, Gemini
+│   └── ai_service.py        # Gemini analysis (Executive summary)
+│
+├── static/
+│   ├── css/
+│   │   └── style.css        # Custom CSS, Dashboard layouts
+│   └── js/
+│       ├── chatbot.js       # AJAX chat, Markdown parsing, MathJax
+│       └── main.js          # General UI scripts
+│
+├── templates/                 # HTML Jinja2 templates
+│   ├── admin/               # Admin specific views
+│   ├── auth/                # Login/Register views
+│   ├── base.html            # Dashboard layout skeleton
+│   ├── public_base.html     # Public website skeleton
+│   ├── chatbot.html         # Main Chat UI
+│   ├── index.html           # Public landing page
+│   └── ...                  # Analysis, Documents, Dashboard views
+│
+└── tests/                   # Pytest automation suite
+    ├── conftest.py          # Fixtures and safe DB setup
+    ├── test_advanced_rag.py # Tests for smart routing/summarization
+    ├── test_ai_analysis.py  # Tests for Gemini summarization
+    ├── test_auth.py         # Tests for login/registration
+    ├── test_database.py     # Tests for cascading deletes
+    ├── test_document.py     # Tests for upload validation
+    ├── test_isolation.py    # Tests ensuring Test DB doesn't hit Prod DB
+    ├── test_kb_fallback.py  # Tests for the deterministic fallback parser
+    ├── test_phase5.py       # Tests for admin routes and health checks
+    ├── test_rag.py          # Tests for ChromaDB retrieval
+    └── test_security.py     # Tests for unauthorized access and path traversal</code></p>
+<div class="page-break"></div>
+
+<h1 id="11-file-by-file-responsibility">11. File-By-File Responsibility</h1>
+
+<ul>
+<li><strong><code>app.py</code></strong>: The entry point. Implements the Application Factory pattern (<code>create_app()</code>), initializes database extensions, sets up login managers, and registers Blueprints.</li>
+<li><strong><code>config.py</code></strong>: Holds <code>Config</code>, <code>DevelopmentConfig</code>, and <code>TestConfig</code>. Reads <code>.env</code> for database URIs and Gemini API keys.</li>
+<li><strong><code>models/database_models.py</code></strong>: Defines the MySQL schema. Key tables: <code>User</code>, <code>Document</code>, <code>DocumentAnalysis</code>, <code>Conversation</code>, <code>Message</code>, <code>KnowledgeBase</code>.</li>
+<li><strong><code>routes/auth_routes.py</code></strong>: Handles user creation, password hashing via Bcrypt, and Flask-Login session creation. Secures the <code>next</code> parameter to prevent Open Redirects.</li>
+<li><strong><code>routes/document_routes.py</code></strong>: Handles multipart form uploads, interacts with <code>document_service</code> for parsing, stores records, triggers embeddings, and triggers AI summary generation.</li>
+<li><strong><code>routes/chat_routes.py</code></strong>: Exposes <code>/api/chat</code>, receiving JSON payloads. Routes the query to <code>rag_service.answer_question()</code> and handles 429/500 HTTP status conversions.</li>
+<li><strong><code>routes/admin_routes.py</code></strong>: Protected routes (<code>@admin_required</code>) allowing admins to add/delete Knowledge Base entries and view system metrics.</li>
+<li><strong><code>routes/main_routes.py</code></strong>: Handles the public <code>/</code> landing page, the protected <code>/dashboard</code>, user <code>/profile</code>, and the public <code>/knowledge-base</code> directory.</li>
+<li><strong><code>services/document_service.py</code></strong>: Validates allowed extensions, sizes, and file content. Uses <code>fitz</code> (PyMuPDF) and <code>docx</code> to extract text and calculate page counts safely.</li>
+<li><strong><code>services/embedding_service.py</code></strong>: Manages the local <code>SentenceTransformer</code> model. Includes the text chunking algorithm (overlapping window) to prepare documents for vectorization.</li>
+<li><strong><code>services/rag_service.py</code></strong>: The "brain" of the application. Queries ChromaDB based on <code>document_id</code> or <code>knowledge_base</code> filters. Sends retrieved context to Gemini via the <code>genai</code> SDK. Implements the robust, deterministic fallback parser when Gemini is down.</li>
+<li><strong><code>ai_service.py</code></strong>: Contains <code>analyze_legal_document()</code>, the dedicated function to prompt Gemini for the structured JSON Executive Summary.</li>
+<li><strong><code>scripts/seed_kb.py</code></strong>: An admin script that generates synthetic legal knowledge base articles via Gemini, embeds them, and stores them in MySQL and ChromaDB to initialize the platform.</li>
+</ul>
+<h1 id="12-database-architecture">12. Database Architecture</h1>
+
+<p><strong>Database Engine:</strong> MySQL<br />
+<strong>Production Database Name:</strong> <code>lexai_db</code><br />
+<strong>Test Database Name:</strong> <code>LexAI_test</code> (SQLite)</p>
+<h3>Table Structures &amp; Relationships</h3>
+<ol>
+<li><strong><code>users</code></strong></li>
+<li><strong>Purpose:</strong> Stores registered accounts and admin roles.</li>
+<li><strong>Columns:</strong> <code>id</code> (PK), <code>email</code>, <code>password_hash</code>, <code>name</code>, <code>role</code> ('user' or 'admin').</li>
+<li>
+<p><strong>Relationships:</strong> Owns Documents, Conversations, and created KnowledgeBase articles.</p>
+</li>
+<li>
+<p><strong><code>documents</code></strong></p>
+</li>
+<li><strong>Purpose:</strong> Metadata for uploaded legal files.</li>
+<li><strong>Columns:</strong> <code>id</code> (PK), <code>user_id</code> (FK), <code>original_filename</code>, <code>file_path</code>, <code>file_size</code>, <code>word_count</code>, <code>page_count</code>.</li>
+<li>
+<p><strong>Relationships:</strong> Owned by User. One-to-One with DocumentAnalysis. Deleted if User is deleted.</p>
+</li>
+<li>
+<p><strong><code>document_analysis</code></strong></p>
+</li>
+<li><strong>Purpose:</strong> Caches the Gemini-generated analysis to prevent re-querying the API.</li>
+<li>
+<p><strong>Columns:</strong> <code>id</code> (PK), <code>document_id</code> (FK), <code>executive_summary</code>, <code>structured_data</code> (JSON).</p>
+</li>
+<li>
+<p><strong><code>knowledge_base</code></strong></p>
+</li>
+<li><strong>Purpose:</strong> Stores curated legal articles for General Legal Chat.</li>
+<li>
+<p><strong>Columns:</strong> <code>id</code> (PK), <code>title</code>, <code>category</code>, <code>created_by</code> (FK to User).</p>
+</li>
+<li>
+<p><strong><code>conversations</code></strong></p>
+</li>
+<li><strong>Purpose:</strong> Groups a series of chat messages.</li>
+<li>
+<p><strong>Columns:</strong> <code>id</code> (PK), <code>user_id</code> (FK), <code>document_id</code> (FK, Nullable - null means it's a General Chat).</p>
+</li>
+<li>
+<p><strong><code>messages</code></strong></p>
+</li>
+<li><strong>Purpose:</strong> Individual chat bubbles.</li>
+<li><strong>Columns:</strong> <code>id</code> (PK), <code>conversation_id</code> (FK), <code>sender</code> ('user' or 'ai'), <code>content</code> (TEXT).</li>
+</ol>
+<div class="mermaid">
+erDiagram
+    USER ||--o{ DOCUMENT : uploads
+    USER ||--o{ CONVERSATION : starts
+    USER ||--o{ KNOWLEDGE_BASE : creates
+    DOCUMENT ||--o| DOCUMENT_ANALYSIS : has
+    DOCUMENT ||--o{ CONVERSATION : "context for"
+    CONVERSATION ||--o{ MESSAGE : contains
+</div>
+
+<h1 id="13-document-processing-pipeline">13. Document Processing Pipeline</h1>
+
+<p>When a user clicks "Upload Document":
+1. <strong>Validation:</strong> <code>document_routes</code> checks if the file is <code>.pdf</code> or <code>.docx</code> and under the 16MB limit. Security checks ensure it's not a disguised script or malware.
+2. <strong>File Storage:</strong> The file is saved securely to <code>uploads/documents/&lt;user_id&gt;/</code>.
+3. <strong>Text Extraction:</strong> <code>document_service</code> processes the binary file, stripping layout and extracting raw unicode text.
+4. <strong>Statistics:</strong> Word counts and page counts are calculated and saved to the <code>documents</code> table in MySQL.
+5. <strong>Chunking:</strong> <code>embedding_service</code> slices the massive string into smaller, overlapping chunks (e.g., 500 words with 50-word overlaps) so context isn't lost across chunk boundaries.
+6. <strong>Embedding &amp; Indexing:</strong> The <code>SentenceTransformer</code> runs on each chunk, generating vectors that are stored in the local <code>chroma_db/</code> folder, tagged with <code>{"document_id": ID, "user_id": ID}</code> metadata.</p>
+<div class="page-break"></div>
+
+<h1 id="14-ai-legal-analysis-pipeline">14. AI Legal Analysis Pipeline</h1>
+
+<p>After a document is processed, LexAI automatically generates a structured analysis.</p>
+<p><strong>The Flow:</strong>
+1. The backend passes the extracted text to <code>ai_service.analyze_legal_document()</code>.
+2. A strict system prompt is attached, forcing Gemini to reply in a specific JSON structure.
+3. Gemini processes the document and returns the JSON.
+4. The backend parses the JSON, creating an Executive Summary and extracting Key Clauses.
+5. The data is saved into the <code>document_analysis</code> MySQL table.
+6. The <code>analysis.html</code> template renders this data dynamically in the browser.</p>
+<p><strong>Error Handling / Resilience:</strong>
+- If Gemini returns <code>503 Unavailable</code> or <code>429 Quota Exceeded</code>, the backend catches the error.
+- The analysis is marked as <em>failed</em>, and the user is shown a friendly error message ("Model experiencing high demand").
+- A "Retry Analysis" button appears on the UI, allowing the user to trigger the analysis later without re-uploading the file.
+- If Gemini returns malformed text instead of JSON, the backend attempts to aggressively clean the string or safely defaults to displaying a raw summary.</p>
+<h1 id="15-rag-system-explained">15. RAG System Explained</h1>
+
+<p>RAG (Retrieval-Augmented Generation) is what prevents LexAI from hallucinating and allows it to securely answer questions about private documents.</p>
+<p><strong>The Concept of a Chunk:</strong>
+Language models have token limits. We cannot feed a 500-page document into Gemini for every chat question. Instead, we break the document into "chunks".</p>
+<p><strong>The Embedder:</strong>
+<code>all-MiniLM-L6-v2</code> turns chunks into vectors. Vectors are essentially mathematical coordinates. Sentences with similar meanings get coordinates close to each other.</p>
+<p><strong>ChromaDB Retrieval:</strong>
+When a user asks "Who is liable?", that question is embedded into a vector. ChromaDB calculates the mathematical distance between the question vector and all document chunk vectors, returning the top 3 closest chunks.</p>
+<h3>Document Chat Mode</h3>
+<ul>
+<li><strong>Filtering:</strong> ChromaDB query includes <code>where={"document_id": user_selected_id}</code>.</li>
+<li><strong>Isolation:</strong> Because the database validates that <code>document.user_id == current_user.id</code>, User A can <em>never</em> query User B's document chunks.</li>
+<li><strong>Generation:</strong> Gemini receives a prompt: "Use the following extracted document chunks to answer...".</li>
+</ul>
+<h3>General Legal Chat Mode</h3>
+<ul>
+<li><strong>Filtering:</strong> ChromaDB query includes <code>where={"source_type": "knowledge_base"}</code>.</li>
+<li><strong>Generation:</strong> Gemini acts as a legal assistant, grounded <em>only</em> by the approved knowledge base articles.</li>
+</ul>
+<h1 id="16-knowledge-base">16. Knowledge Base</h1>
+
+<p>The Knowledge Base (KB) is a curated repository of general legal concepts (e.g., "Breach of Contract", "NDAs"). It prevents LexAI from giving unauthorized or wild legal advice by restricting general chat answers to approved topics.</p>
+<p><strong>Management &amp; Storage:</strong>
+- Admins can view, add, and delete articles via the <code>/admin</code> interface.
+- Title and Category metadata is stored in MySQL.
+- The actual article content is embedded and stored in ChromaDB using <code>source_type: knowledge_base</code>.</p>
+<p><strong>KB Seeding (<code>seed_kb.py</code>):</strong>
+To bootstrap the platform, <code>scripts/seed_kb.py</code> iterates through a list of fundamental legal topics. It calls Gemini to generate comprehensive articles for each topic, embeds them, and inserts them into both MySQL and ChromaDB. Due to Gemini's free-tier rate limits (15 requests per minute), the script includes automatic 60-second sleep cycles.</p>
+<p><strong>The Deterministic KB Fallback Mechanism:</strong>
+If Gemini goes down (HTTP 503 or 429) during a General Legal Chat, the RAG system intercepts the failure. Because ChromaDB successfully retrieved the relevant KB chunks <em>before</em> the Gemini failure, a custom python parser (<code>construct_fallback_response</code>) kicks in. It deterministically strips Markdown metadata out of the database chunk, isolates the Direct Answer, Key Information, and Remedies based on the user's query keywords, and returns a perfectly formatted Markdown response—ensuring the user still gets a reliable answer without needing the AI generation step!</p>
+<div class="page-break"></div>
+
+<h1 id="17-chat-system">17. Chat System</h1>
+
+<p>The Chat System relies on AJAX requests to provide a seamless, non-reloading interface.</p>
+<ol>
+<li><strong>Frontend:</strong> <code>chatbot.js</code> intercepts the form submission. It appends a temporary "Loading" bubble and sends a <code>POST /api/chat</code> request containing the <code>message</code>, <code>conversation_id</code>, and <code>document_id</code>.</li>
+<li><strong>Backend:</strong> The route validates ownership, queries the RAG service, and gets an answer.</li>
+<li><strong>Storage:</strong> It saves the user's message and the AI's response to the <code>messages</code> MySQL table, associated with a <code>conversation_id</code>.</li>
+<li><strong>Return:</strong> It returns JSON containing the <code>answer</code> and the <code>sources</code>.</li>
+<li><strong>Rendering:</strong> <code>chatbot.js</code> passes the answer through <code>marked.js</code> (for Markdown formatting), <code>DOMPurify</code> (for security), and finally calls <code>MathJax</code> to format any embedded mathematical equations (common in contract logic explanations).</li>
+</ol>
+<h1 id="18-authentication-security">18. Authentication & Security</h1>
+
+<p>LexAI employs robust security measures:
+- <strong>Password Security:</strong> Plaintext passwords are never stored. <code>Flask-Bcrypt</code> hashes passwords with salt.
+- <strong>Session Management:</strong> <code>Flask-Login</code> handles HttpOnly session cookies.
+- <strong>Role-Based Access Control (RBAC):</strong> Admin routes are protected by an <code>@admin_required</code> decorator. If a normal user tries to access <code>/admin</code>, they are redirected.
+- <strong>Data Isolation:</strong> Every single database query for documents or conversations includes <code>.filter_by(user_id=current_user.id)</code>. Path traversal attacks (e.g., trying to read <code>../../etc/passwd</code>) are blocked using <code>werkzeug.utils.secure_filename</code>.
+- <strong>Open Redirect Protection:</strong> The login system validates that the <code>next</code> URL is a relative path (local) and not an external malicious site.
+- <strong>Cross-Site Scripting (XSS):</strong> <code>DOMPurify</code> aggressively scrubs all AI-generated output on the frontend to ensure no <code>&lt;script&gt;</code> tags are executed.</p>
+<h1 id="19-error-handling">19. Error Handling</h1>
+
+<ul>
+<li><strong>HTTP 404 (Not Found):</strong> Handled gracefully with a custom <code>404.html</code> page for browsers, and a standard JSON response for API endpoints.</li>
+<li><strong>HTTP 413 (Payload Too Large):</strong> Triggers if a user uploads a file &gt; 16MB. Returns a friendly flash message.</li>
+<li><strong>HTTP 429 (Too Many Requests):</strong> Used specifically when Gemini hits its rate limit. The chatbot frontend catches this and displays the deterministic fallback or a friendly retry message.</li>
+<li><strong>HTTP 500/503 (Server/Service Unavailable):</strong> Caught during RAG processing. The user is informed that the model is experiencing high demand.</li>
+</ul>
+<div class="page-break"></div>
+
+<h1 id="20-testing">20. Testing</h1>
+
+<p>LexAI includes a rigorous, production-grade Pytest automation suite designed to protect the codebase against regressions.</p>
+<p><strong>Framework:</strong> <code>pytest</code><br />
+<strong>Latest Test Result:</strong> <strong>86/86 Tests Passed</strong> (0 Failures)  </p>
+<p><strong>Isolation Strategy:</strong> 
+The tests <strong>never</strong> touch production data. <code>tests/conftest.py</code> actively forces the application to use an in-memory or SQLite database (<code>LexAI_test</code>) and a separate ephemeral ChromaDB directory (<code>chroma_db_test/</code>). The suite includes fail-safes that immediately abort testing if they detect the production database URI.</p>
+<p><strong>Key Test Categories:</strong>
+- <code>test_auth.py</code>: Verifies login logic, short passwords, duplicate emails.
+- <code>test_security.py</code>: Proves User B cannot access User A's documents, chats, or RAG vectors. Proves path traversal and malicious executable uploads are blocked.
+- <code>test_rag.py</code>: Verifies vector chunking lengths, overlap logic, and empty-file handling.
+- <code>test_kb_fallback.py</code>: Mocks <code>google.genai.Client</code> to simulate network failures, proving the deterministic fallback parser generates clean, truncated Markdown without raw database separators.
+- <code>test_database.py</code>: Ensures cascading deletes work (deleting a user successfully deletes their documents and chat history).</p>
+<h1 id="21-project-development-phases">21. Project Development Phases</h1>
+
+<p><strong>PHASE 1: Foundation (Implemented)</strong>
+- Set up Flask, MySQL, and SQLAlchemy.
+- Implemented User Authentication, Password Hashing, and Dashboard UI.</p>
+<p><strong>PHASE 2: Document Management (Implemented)</strong>
+- Built file upload system with security validations.
+- Integrated PyMuPDF and python-docx for text extraction and word counting.</p>
+<p><strong>PHASE 3: AI Legal Analysis (Implemented)</strong>
+- Connected Google Gemini API.
+- Implemented structured JSON prompts for Executive Summaries.
+- Built the Analysis UI to display extracted clauses.</p>
+<p><strong>PHASE 4: RAG &amp; Chat Systems (Implemented)</strong>
+- Set up local SentenceTransformers and ChromaDB.
+- Implemented text chunking.
+- Built the Chatbot frontend and connected it to the RAG backend, ensuring strict user-document isolation.</p>
+<p><strong>PHASE 5: Knowledge Base &amp; Admin (Implemented)</strong>
+- Developed the Admin Dashboard and KB CRUD interface.
+- Created <code>seed_kb.py</code> to auto-generate the legal knowledge corpus.
+- Separated General Legal Chat from Document Chat.</p>
+<p><strong>PHASE 6: Optimization &amp; Stability (Implemented)</strong>
+- Fixed Open Redirect vulnerabilities.
+- Extracted main routes into Blueprints for cleaner architecture.
+- Replaced deprecated SQLAlchemy APIs to resolve warnings.
+- Built the deterministic 503 KB Fallback mechanism and frontend MathJax rendering.</p>
+<h1 id="22-current-project-status">22. Current Project Status</h1>
+
+<p><strong>WHERE WE ARE NOW</strong>
+The project is fundamentally complete for its core requirements. 
+- <strong>Completed &amp; Working:</strong> Authentication, Uploads, RAG, Chat, AI Summarization, Admin Panel, Knowledge Base, Automated Testing.
+- <strong>Stability:</strong> The system passes 86/86 tests. All critical bugs, routing issues, and AI fallback parsing issues have been completely resolved. 
+- <strong>Warnings:</strong> Only 3 minor warnings remain during testing, which originate entirely from third-party upstream dependencies (e.g., a deprecation inside the <code>chromadb</code> telemetry module), not the LexAI codebase itself.
+- <strong>Pending / Future Work:</strong> Cloud deployment, OCR, multilingual support.</p>
+<h1 id="23-gemini-api-quota">23. Gemini API / Quota</h1>
+
+<p>LexAI heavily relies on the Google Gemini API (<code>GEMINI_API_KEY</code>).
+- The key is configured in the <code>.env</code> file. It acts as a secret password and <strong>must never be committed to GitHub</strong>.
+- The <code>AI_MODEL</code> variable defines which Gemini version to use (e.g., <code>gemini-2.5-flash</code>).
+- <strong>Quota / 429 Error:</strong> The free tier of Gemini limits users to 15 requests per minute. If you click too rapidly or run the seed script too fast, Google blocks the request. LexAI handles this gracefully.
+- <strong>Service Unavailable / 503 Error:</strong> Sometimes Google's servers are overloaded. This is external to LexAI.</p>
+<div class="page-break"></div>
+
+<h1 id="24-environment-variables">24. Environment Variables</h1>
+
+<p>The project requires a <code>.env</code> file in the root directory. Below is the reference list (derived from <code>.env.example</code>):</p>
+<ul>
+<li><code>FLASK_APP=app.py</code>: Tells Flask where the app starts.</li>
+<li><code>FLASK_ENV=development</code>: Turns on development mode (do not use in production).</li>
+<li><code>FLASK_DEBUG=1</code>: Enables the interactive debugger.</li>
+<li><code>SECRET_KEY=YOUR_SECRET_KEY</code>: Secures user session cookies. Make this random.</li>
+<li><code>DB_HOST=localhost</code>: The MySQL server address.</li>
+<li><code>DB_USER=root</code>: Your MySQL username.</li>
+<li><code>DB_PASSWORD=YOUR_DB_PASSWORD</code>: Your MySQL password.</li>
+<li><code>DB_NAME=lexai_db</code>: The name of the MySQL database.</li>
+<li><code>GEMINI_API_KEY=YOUR_GEMINI_API_KEY</code>: Your personal Google AI API key.</li>
+<li><code>AI_MODEL=gemini-2.5-flash</code>: The targeted LLM.</li>
+</ul>
+<p><em>(Note: Real keys are strictly excluded from this documentation.)</em></p>
+<h1 id="25-how-to-setup-project-locally">25. How to Setup Project Locally</h1>
+
+<p>For new teammates joining development on Windows:</p>
+<ol>
+<li><strong>Clone the repository.</strong></li>
+<li><strong>Create a virtual environment:</strong> <code>python -m venv venv</code></li>
+<li><strong>Activate it:</strong> <code>venv\Scriptsctivate</code> (or <code>. venv/bin/activate</code> on Mac/Linux)</li>
+<li><strong>Install dependencies:</strong> <code>pip install -r requirements.txt</code></li>
+<li><strong>Setup MySQL:</strong> Ensure MySQL Server is running locally.</li>
+<li><strong>Configure <code>.env</code>:</strong> Copy <code>.env.example</code> to <code>.env</code> and fill in your DB credentials and Gemini key.</li>
+<li><strong>Create Databases:</strong> Run <code>python setup_db.py</code> to create <code>lexai_db</code> and <code>LexAI_test</code>.</li>
+<li><strong>Initialize Tables:</strong> Run <code>python init_db.py</code> to create the schema and an initial admin account.</li>
+<li><strong>Seed Knowledge Base (Optional but recommended):</strong> Run <code>python scripts/seed_kb.py</code> to populate the AI knowledge base. <em>(Note: Takes a few minutes due to API rate limits).</em></li>
+</ol>
+<h1 id="26-how-to-run-the-project">26. How to Run the Project</h1>
+
+<p><strong>Start the web server:</strong>
+<code>powershell
+venv\Scriptsctivate
+python app.py</code>
+Then navigate to <code>http://127.0.0.1:5000</code> in your browser.</p>
+<p><strong>Run the Automated Tests:</strong>
+<code>powershell
+venv\Scriptsctivate
+python -m pytest -v</code></p>
+<h1 id="27-how-to-add-a-new-knowledge-base-article">27. How to Add a New Knowledge Base Article</h1>
+
+<p>There are two ways to add articles to the KB:
+1. <strong>Via UI:</strong> Login as an Admin, click "Admin Dashboard" in the sidebar, and use the "Add Knowledge Base Entry" form. This saves the metadata to MySQL and automatically embeds the content into ChromaDB.
+2. <strong>Via Script:</strong> Add a tuple to the <code>kb_topics</code> list in <code>scripts/seed_kb.py</code> and run the script. It will call Gemini to write the article, embed it, and store it.</p>
+<h1 id="28-how-to-debug-common-problems">28. How to Debug Common Problems</h1>
+
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Possible Cause</th>
+<th>How to Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Gemini 429 Error</strong></td>
+<td>Rate limit exceeded (15 RPM).</td>
+<td>Wait 60 seconds and try again.</td>
+</tr>
+<tr>
+<td><strong>Database Connection Failure</strong></td>
+<td>MySQL is not running or wrong <code>.env</code> credentials.</td>
+<td>Open Services, start MySQL. Check <code>DB_PASSWORD</code>.</td>
+</tr>
+<tr>
+<td><strong>Empty AI Analysis</strong></td>
+<td>Gemini returned malformed JSON or errored out.</td>
+<td>Check the server console logs. Click "Retry Analysis" in UI.</td>
+</tr>
+<tr>
+<td><strong>Missing Module Error</strong></td>
+<td>Virtual environment not active.</td>
+<td>Run <code>venv\Scriptsctivate</code> before <code>python app.py</code>.</td>
+</tr>
+<tr>
+<td><strong>Routing <code>BuildError</code></strong></td>
+<td>Missing Blueprint prefix in <code>url_for</code>.</td>
+<td>Ensure <code>url_for('index')</code> is written as <code>url_for('main.index')</code>.</td>
+</tr>
+</tbody>
+</table>
+<div class="alert alert-warning">
+<strong>CRITICAL DATABASE WARNING:</strong><br>
+Never run <code>db.drop_all()</code> or delete the <code>chroma_db/</code> folder in production unless you intend to completely destroy all user data, documents, and embeddings. Use migrations for schema updates.
+</div>
+
+<div class="page-break"></div>
+
+<h1 id="29-development-rules-for-teammates">29. Development Rules for Teammates</h1>
+
+<ol>
+<li><strong>Never commit <code>.env</code>:</strong> Keep your API keys and passwords safe.</li>
+<li><strong>Never run destructive commands:</strong> Do not wipe the database to fix a small issue.</li>
+<li><strong>Never point tests to production:</strong> Ensure <code>conftest.py</code> is intact. Tests must ALWAYS run against <code>LexAI_test</code>.</li>
+<li><strong>Run tests before pushing:</strong> Run <code>python -m pytest -v</code>. Do not push if it's below 86/86.</li>
+<li><strong>Preserve Document Isolation:</strong> When writing database queries, ALWAYS include <code>.filter_by(user_id=current_user.id)</code> to prevent users from seeing other people's data.</li>
+<li><strong>Keep Frontend/Backend separate:</strong> Put business logic in <code>services/</code>, route definitions in <code>routes/</code>, and UI in <code>templates/</code>.</li>
+</ol>
+<h1 id="30-project-limitations">30. Project Limitations</h1>
+
+<ul>
+<li><strong>Gemini API Limits:</strong> Heavy usage by multiple simultaneous users will exhaust the free-tier API limits quickly.</li>
+<li><strong>Local Storage:</strong> Uploaded files and ChromaDB vectors are currently stored locally on the server disk. This makes load-balancing across multiple servers difficult without moving to cloud object storage.</li>
+<li><strong>No Replacement for Professionals:</strong> The AI can hallucinate or misinterpret complex jurisdictional nuances. LexAI explicitly warns users that it is an assistant, not a lawyer.</li>
+<li><strong>OCR Missing:</strong> It cannot read scanned image PDFs, only text-based PDFs.</li>
+</ul>
+<h1 id="31-future-scope">31. Future Scope</h1>
+<p><em>(Not currently implemented)</em>
+- <strong>Cloud Deployment:</strong> Migrating the database to Google Cloud SQL and storage to Firebase.
+- <strong>Multilingual Support:</strong> Utilizing Gemini to translate legal advice into local regional languages.
+- <strong>Advanced Document Comparison:</strong> Uploading two versions of a contract and having the AI highlight exact clause differences.
+- <strong>Scalable Vector Database:</strong> Replacing local ChromaDB with Pinecone or managed Vertex AI Vector Search.</p>
+<h1 id="32-team-handover-section">32. Team Handover Section</h1>
+
+<p><strong>IF YOU ARE A NEW DEVELOPER ON LEXAI, START HERE:</strong></p>
+<ol>
+<li>Read the <strong><code>README.md</code></strong> for a high-level summary.</li>
+<li>Read <strong><code>config.py</code></strong> to understand how the environment is set up.</li>
+<li>Read <strong><code>models/database_models.py</code></strong> to understand the data relationships.</li>
+<li>Dive into <strong><code>services/rag_service.py</code></strong>—this is the most complex and important file in the system.</li>
+</ol>
+<p><strong>Where to look to modify specific features:</strong>
+- <strong>Changing Login/Registration:</strong> Go to <code>routes/auth_routes.py</code> and <code>templates/auth/</code>.
+- <strong>Changing AI Prompts:</strong> Go to <code>ai_service.py</code> (for Analysis) and <code>services/rag_service.py</code> (for Chat).
+- <strong>Tweaking Chunk Sizes:</strong> Go to <code>services/embedding_service.py</code>.
+- <strong>Fixing Chat UI Bugs:</strong> Go to <code>static/js/chatbot.js</code> and <code>templates/chatbot.html</code>.
+- <strong>Adding New Pages:</strong> Register them in <code>routes/main_routes.py</code> and link them in <code>templates/base.html</code>.</p>
+<h1 id="33-glossary">33. Glossary</h1>
+
+<ul>
+<li><strong>LLM (Large Language Model):</strong> An AI trained on massive amounts of text, capable of generating human-like responses (e.g., Gemini).</li>
+<li><strong>ORM (Object-Relational Mapper):</strong> A tool (like SQLAlchemy) that lets developers query a database using Python instead of raw SQL.</li>
+<li><strong>Embedding:</strong> A mathematical representation (vector array) of text, allowing computers to measure semantic similarity.</li>
+<li><strong>Chunk:</strong> A small piece of a larger document, broken down so it fits within an AI's token limit.</li>
+<li><strong>JSON:</strong> A standard text format for structuring data, used for API communications and structured AI outputs.</li>
+<li><strong>RBAC (Role-Based Access Control):</strong> Restricting system access based on the user's role (admin vs. user).</li>
+<li><strong>XSS (Cross-Site Scripting):</strong> A vulnerability where attackers inject malicious scripts into web pages. Prevented in LexAI using <code>DOMPurify</code>.</li>
+<li><strong>HTTP 429:</strong> A status code indicating "Too Many Requests" (Rate Limit hit).</li>
+<li><strong>HTTP 503:</strong> A status code indicating the service is temporarily overloaded or unavailable.</li>
+</ul>
+</body>
+</html>

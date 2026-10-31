@@ -99,7 +99,8 @@ def analyze_legal_document(text):
                 
             except Exception as e:
                 error_str = str(e)
-                is_temporary = any(x in error_str.upper() for x in ["429", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE", "TIMEOUT"])
+                error_upper = error_str.upper()
+                is_temporary = any(x in error_upper for x in ["429", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE", "TIMEOUT"])
                 
                 if is_temporary and attempt < max_retries - 1:
                     delay = base_delay * (2 ** attempt)
@@ -107,10 +108,16 @@ def analyze_legal_document(text):
                     continue
                 
                 if isinstance(e, json.JSONDecodeError):
-                    raise ValueError(f"Failed to parse JSON from AI response: {str(e)}")
+                    raise ValueError(f"Failed to parse structured legal insights from AI response: {str(e)}")
+                    
+                if "401" in error_upper or "UNAUTHENTICATED" in error_upper or "API_KEY_INVALID" in error_upper:
+                    raise ValueError("AI service authentication failed. The provided GEMINI_API_KEY is invalid or unauthorized. Please verify your API key in Google AI Studio.")
+                    
+                if "404" in error_upper or "NOT_FOUND" in error_upper:
+                    raise ValueError(f"Configured AI model '{model_name}' was not found. Please update AI_MODEL to 'gemini-3.6-flash' or 'gemini-2.5-flash'.")
                     
                 if is_temporary:
-                    raise ValueError(f"AI analysis is temporarily unavailable because the AI service is currently busy. Please try again later.")
+                    raise ValueError("AI analysis is temporarily unavailable because the service is currently busy or rate-limited. Please try again shortly.")
                 
                 raise ValueError(f"AI Analysis failed: {error_str}")
 

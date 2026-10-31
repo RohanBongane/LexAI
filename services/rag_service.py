@@ -92,7 +92,7 @@ def answer_question(user_id, question, document_id=None):
             dists = res.get('distances', [[]])[0] if 'distances' in res and res['distances'] else [0]*len(docs)
             
             for d, m, dist in zip(docs, metas, dists):
-                if dist > 1.5:  
+                if dist > 2.2:  
                     continue
                 if d in seen_chunks:
                     continue
@@ -131,10 +131,44 @@ def answer_question(user_id, question, document_id=None):
             source_idx += 1
             
         if not context_blocks:
-            return {
-                "answer": "I don't have enough information in the available legal knowledge base or documents to answer that reliably.",
-                "sources": []
-            }
+            # Keep document questions grounded in the uploaded document
+            if document_id or intent == "DOCUMENT_SPECIFIC":
+                return {
+                    "answer": "I don't have enough information in the selected document or available sources to answer that reliably.",
+                    "sources": []
+                }
+
+            # Answer general legal questions even when the Knowledge Base has no matching article
+            general_prompt = f"""You are LexAI, an AI legal information assistant.
+
+Answer the user's general legal question in simple, clear language.
+Provide a useful definition, explanation, and example where appropriate.
+Assume the user is asking about Indian law unless they specify another jurisdiction.
+Do not invent legal sections, cases, penalties, or procedures.
+If a legal detail is uncertain, say so clearly.
+This is general legal information, not personalized legal advice.
+
+User question: {question}
+
+End with this disclaimer:
+This information is AI-generated for educational and informational purposes only and does not constitute professional legal advice. Laws vary by jurisdiction and circumstances. Consult a qualified legal professional for advice about your specific situation.
+"""
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=general_prompt
+                )
+                return {
+                    "answer": response.text,
+                    "sources": []
+                }
+            except Exception as e:
+                import logging
+                logging.warning(f"General fallback generation error: {e}")
+                return {
+                    "answer": "I don't have enough information in the available legal knowledge base or documents to answer that reliably.",
+                    "sources": []
+                }
             
         context_text = "\n\n".join(context_blocks)
         
@@ -207,15 +241,21 @@ USER QUESTION:
         import traceback
         error_msg = f"RAG Error: {e}\n{traceback.format_exc()}"
         logging.error(error_msg)
-        # Check for quota issues specifically
-        if "429" in str(e) or "quota" in str(e).lower() or "503" in str(e):
+        err_str = str(e).upper()
+        # Check for authentication, quota, or availability issues specifically
+        if any(x in err_str for x in ["401", "UNAUTHENTICATED", "429", "QUOTA", "503", "RESOURCE_EXHAUSTED", "UNAVAILABLE"]):
             fallback_res = construct_fallback_response(context_blocks, sources, question)
             if fallback_res:
                 return fallback_res
                 
             if not context_blocks:
+                if "401" in err_str or "UNAUTHENTICATED" in err_str:
+                    return {
+                        "answer": "The AI service is currently unauthorized. Please ensure a valid GEMINI_API_KEY is configured in your environment settings.",
+                        "sources": []
+                    }
                 return {
-                    "answer": "I couldn't find enough relevant information in the LexAI Knowledge Base to answer this reliably, and the AI service is currently unavailable.",
+                    "answer": "I couldn't find enough relevant information in the LexAI Knowledge Base to answer this reliably, and the AI service is currently unavailable or rate-limited.",
                     "sources": []
                 }
                 
@@ -333,5 +373,5 @@ def construct_fallback_response(context_blocks, sources, question=""):
     
     return {
         "answer": fallback,
-        "sources": []
+        "sources": sources
     }

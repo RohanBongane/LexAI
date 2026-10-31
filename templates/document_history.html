@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}My Documents{% endblock %}
+{% block page_title %}Documents / My Documents{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold"><i class="bi bi-folder2-open text-warning me-2"></i>My Documents</h2>
+            <p class="text-muted mb-0">View, analyze, and chat with your uploaded legal documents.</p>
+        </div>
+        <div>
+            <a href="{{ url_for('document.upload') }}" class="btn btn-primary shadow-sm">
+                <i class="bi bi-cloud-arrow-up me-2"></i>Upload Document
+            </a>
+        </div>
+    </div>
+
+    {% if documents %}
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Document Name</th>
+                        <th>Upload Date</th>
+                        <th>Pages / Words</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-pdf fs-4 text-danger me-3"></i>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ doc.original_filename }}</div>
+                                    <span class="badge bg-light text-dark border">{{ doc.file_type | upper }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-muted small">
+                            {% if doc.uploaded_at %}
+                                {{ doc.uploaded_at.strftime('%d %b %Y, %I:%M %p') }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td class="small text-muted">
+                            {{ doc.page_count or 0 }} pgs &bull; {{ doc.word_count or 0 }} words
+                        </td>
+                        <td>
+                            {% if doc.status == 'completed' %}
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="bi bi-check-circle me-1"></i>Ready</span>
+                            {% else %}
+                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning">Processing</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('document.analysis', document_id=doc.id) }}"
+                                   class="btn btn-outline-primary" title="View Analysis">
+                                    <i class="bi bi-file-earmark-bar-graph me-1"></i> Analysis
+                                </a>
+                                {% if doc.status == 'completed' %}
+                                <a href="{{ url_for('chat.chat_ui') }}?mode=document&doc={{ doc.id }}"
+                                   class="btn btn-outline-success" title="Chat with Document">
+                                    <i class="bi bi-chat-dots me-1"></i> Chat
+                                </a>
+                                {% endif %}
+                                <form action="{{ url_for('document.delete', document_id=doc.id) }}"
+                                      method="POST" class="d-inline"
+                                      onsubmit="return confirm('Are you sure you want to delete this document?');">
+                                    <button type="submit" class="btn btn-outline-danger" title="Delete Document">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card shadow-sm border-0 rounded-4 text-center p-5">
+        <i class="bi bi-folder2-open display-4 text-muted mb-3"></i>
+        <h4 class="fw-bold">No documents uploaded yet</h4>
+        <p class="text-muted">Upload a legal contract or agreement to analyze and query it with AI.</p>
+        <div>
+            <a href="{{ url_for('document.upload') }}" class="btn btn-primary">
+                <i class="bi bi-cloud-arrow-up me-2"></i>Upload Your First Document
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

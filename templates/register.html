@@ -1,61 +1,105 @@
+
 {% extends "public_base.html" %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Create Account{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center align-items-center py-5" style="min-height: calc(100vh - 150px);">
-    <div class="col-md-6 col-lg-5 col-xl-4">
-        <div class="text-center mb-4">
-            <h1 class="fw-bold text-primary"><i class="bi bi-bank me-2"></i>LexAI</h1>
-            <p class="text-muted">Create your legal workspace account</p>
-        </div>
-        
-        <div class="card border-0 shadow">
-            <div class="card-body p-5">
-                <form action="{{ url_for('auth.register') }}" method="POST">
-                    <div class="mb-3">
-                        <label for="name" class="form-label fw-bold small text-uppercase text-muted">Full Name</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
-                            <input type="text" class="form-control border-start-0 ps-0 bg-light" id="name" name="name" required placeholder="Jane Doe">
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="email" class="form-label fw-bold small text-uppercase text-muted">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
-                            <input type="email" class="form-control border-start-0 ps-0 bg-light" id="email" name="email" required placeholder="name@company.com">
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="password" class="form-label fw-bold small text-uppercase text-muted">Password (min 8 characters)</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                            <input type="password" class="form-control border-start-0 ps-0 bg-light" id="password" name="password" required minlength="8" placeholder="••••••••">
-                        </div>
-                    </div>
-                    
-                    
-                    <div class="mb-4">
-                        <label for="confirm_password" class="form-label fw-bold small text-uppercase text-muted">Confirm Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock-fill text-muted"></i></span>
-                            <input type="password" class="form-control border-start-0 ps-0 bg-light" id="confirm_password" name="confirm_password" required minlength="8" placeholder="********">
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid mb-4">
-                        <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
-                    </div>
-                    
-                    <div class="text-center">
-                        <p class="small text-muted mb-0">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-primary text-decoration-none fw-bold">Sign In</a></p>
-                    </div>
-                </form>
+<section class="lexai-auth-section lexai-register-section">
+    <div class="lexai-auth-glow lexai-auth-glow-one"></div>
+    <div class="lexai-auth-glow lexai-auth-glow-two"></div>
+
+    <div class="lexai-auth-container">
+
+        <!-- Brand heading -->
+        <div class="lexai-auth-heading">
+            <div class="lexai-auth-logo">
+                <i class="bi bi-bank"></i>
             </div>
+
+            <span class="lexai-auth-eyebrow">YOUR LEGAL INTELLIGENCE WORKSPACE</span>
+
+            <h1>Create your <span>LexAI</span> account</h1>
+
+            <p>Start exploring legal knowledge with greater clarity and confidence.</p>
         </div>
-    </div>
+
+        <!-- Registration card -->
+        <div class="lexai-auth-card">
+    {% include "_register_form.html" %}
+
+    <p class="lexai-auth-switch">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}">Sign in</a>
+    </p>
 </div>
+
+        <p class="lexai-auth-footer-note">
+            <i class="bi bi-shield-lock"></i>
+            Your journey towards clearer legal understanding starts here.
+        </p>
+
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const message = document.getElementById('lexaiPasswordMessage');
+    const form = document.getElementById('lexaiRegisterForm');
+
+    document.querySelectorAll('.lexai-password-toggle').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const input = document.getElementById(
+                button.getAttribute('data-password-target')
+            );
+            const icon = button.querySelector('i');
+
+            const showPassword = input.type === 'password';
+            input.type = showPassword ? 'text' : 'password';
+            button.setAttribute('aria-pressed', String(showPassword));
+            button.setAttribute(
+                'aria-label',
+                showPassword ? 'Hide password' : 'Show password'
+            );
+
+            icon.className = showPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+    });
+
+    function checkPasswords() {
+        if (!confirmPassword.value) {
+            message.textContent = '';
+            confirmPassword.setCustomValidity('');
+            return true;
+        }
+
+        const matches = password.value === confirmPassword.value;
+
+        message.textContent = matches
+            ? 'Passwords match.'
+            : 'Passwords do not match.';
+
+        message.classList.toggle('is-valid', matches);
+        message.classList.toggle('is-invalid', !matches);
+
+        confirmPassword.setCustomValidity(
+            matches ? '' : 'Passwords do not match.'
+        );
+
+        return matches;
+    }
+
+    password.addEventListener('input', checkPasswords);
+    confirmPassword.addEventListener('input', checkPasswords);
+
+    form.addEventListener('submit', function (event) {
+        if (!checkPasswords()) {
+            event.preventDefault();
+            confirmPassword.reportValidity();
+        }
+    });
+});
+</script>
 {% endblock %}

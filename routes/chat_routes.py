@@ -17,11 +17,37 @@ def chat_ui(document_id=None):
         if doc.user_id != current_user.id and current_user.role != 'admin':
             abort(403)
             
-    # Get user conversations for sidebar
-    conversations = Conversation.query.filter_by(user_id=current_user.id).order_by(Conversation.updated_at.desc()).all()
-    documents = Document.query.filter_by(user_id=current_user.id, status='completed').all()
+    conversation_id = request.args.get('conversation_id', type=int)
+    if conversation_id:
+        conversation = db.get_or_404(Conversation, conversation_id)
+        if conversation.user_id != current_user.id and current_user.role != 'admin':
+            abort(403)
+        if not doc and conversation.document_id:
+            doc = db.session.get(Document, conversation.document_id)
+
+    conversations = Conversation.query.filter_by(
+        user_id=current_user.id
+    ).order_by(Conversation.updated_at.desc()).all()
+    documents = Document.query.filter_by(
+        user_id=current_user.id, status='completed'
+    ).all()
     
-    return render_template('chatbot.html', document=doc, conversations=conversations, documents=documents)
+    return render_template(
+        'chatbot.html',
+        document=doc,
+        conversations=conversations,
+        documents=documents,
+        conversation_id=conversation_id
+    )
+
+@chat_bp.route('/chat-history', methods=['GET'])
+@chat_bp.route('/chat/history', methods=['GET'])
+@login_required
+def chat_history():
+    conversations = Conversation.query.filter_by(
+        user_id=current_user.id
+    ).order_by(Conversation.updated_at.desc()).all()
+    return render_template('chat_history.html', conversations=conversations)
 
 @chat_bp.route('/api/chat', methods=['POST'])
 @login_required
@@ -93,7 +119,7 @@ def api_chat():
 @login_required
 def get_messages(conversation_id):
     conversation = db.get_or_404(Conversation, conversation_id)
-    if conversation.user_id != current_user.id:
+    if conversation.user_id != current_user.id and current_user.role != 'admin':
         abort(403)
         
     messages = Message.query.filter_by(conversation_id=conversation.id).order_by(Message.created_at.asc()).all()

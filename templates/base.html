@@ -39,6 +39,9 @@
             <a href="{{ url_for('chat.chat_ui') }}" class="sidebar-link {% if request.endpoint == 'chat.chat_ui' %}active{% endif %}">
                 <i class="bi bi-chat-square-text me-2"></i> AI Chat
             </a>
+            <a href="{{ url_for('chat.chat_history') }}" class="sidebar-link {% if request.endpoint == 'chat.chat_history' %}active{% endif %}">
+                <i class="bi bi-clock-history me-2"></i> Chat History
+            </a>
             <a href="{{ url_for('document.upload') }}" class="sidebar-link {% if request.endpoint == 'document.upload' %}active{% endif %}">
                 <i class="bi bi-file-earmark-text me-2"></i> AI Analysis
             </a>

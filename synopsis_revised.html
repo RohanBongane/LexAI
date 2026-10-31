@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 1in;
+            @bottom-center {
+                content: counter(page);
+            }
+        }
+        body {
+            font-family: "Bookman Old Style", serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: black;
+            text-align: justify;
+        }
+        h1, h2, h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 18pt;
+            margin-bottom: 6pt;
+        }
+        p {
+            margin-bottom: 12pt;
+            margin-top: 0;
+        }
+        ul {
+            margin-top: 0;
+            margin-bottom: 12pt;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 6pt;
+        }
+        .cover-page {
+            text-align: center;
+            page-break-after: always;
+            padding-top: 20px;
+        }
+        .cover-page img {
+            width: 1.5in;
+            height: auto;
+            margin: 20px 0;
+        }
+        .cover-page p, .cover-page h1 {
+            text-align: center;
+            margin: 0;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        .signatures {
+            width: 100%;
+            margin-top: 80px;
+            page-break-inside: avoid;
+        }
+        .sig-left {
+            float: left;
+            text-align: left;
+        }
+        .sig-right {
+            float: right;
+            text-align: right;
+        }
+        .clear {
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER PAGE -->
+    <div class="cover-page">
+        <p class="bold">PROJECT SYNOPSIS</p>
+        <p class="bold">On</p>
+        <br>
+        <p class="bold">“LexAI – AI-Powered Legal Assistant & Contract Intelligence Platform”</p>
+        <br><br><br>
+        <p class="bold">Submitted to</p>
+        <br>
+        <p class="bold">Chhatrapati Shivaji Maharaj University, Panvel, Navi Mumbai</p>
+        <br><br>
+        <img src="csmu_logo.png" alt="CSMU Logo">
+        <br><br>
+        <p>for the partial fulfillment of requirement for the Degree of</p>
+        <br>
+        <p class="bold">MASTER OF COMPUTER APPLICATION</p>
+        <br><br><br>
+        <p class="bold">Submitted By</p>
+        <br>
+        <p>Rohan Bongane</p>
+        <p>Harsh Jha</p>
+        <p>Aishwariya Bhunia</p>
+        <p>Nitu Sharma</p>
+        <br><br><br>
+        <p class="bold">Guide</p>
+        <br>
+        <p>Dr. Surekha Kohle</p>
+        <br><br><br><br>
+        <p class="bold">Department of Computer Science & Information Technology</p>
+        <p class="bold">Chhatrapati Shivaji Maharaj University, Panvel, Navi Mumbai</p>
+        <br>
+        <p class="bold">Academic Year:</p>
+        <p class="bold">2026–27</p>
+    </div>
+
+    <!-- BODY -->
+    <h2>1. Introduction</h2>
+    <p>The legal domain is characterized by densely packed terminology and exceptionally lengthy documents, creating significant barriers to entry for individuals and small businesses. Commercial contracts, non-disclosure agreements, and terms of service are often obfuscated by specialized jargon. Manually reviewing these documents requires immense cognitive effort and frequently necessitates consulting expensive legal professionals to comprehend basic rights, obligations, and hidden risks.</p>
+    
+    <p>LexAI is an AI-assisted legal information and document intelligence platform designed to bridge this accessibility gap. Utilizing a Flask-based web architecture, LexAI allows users to upload complex legal contracts in PDF or DOCX formats. The platform automates the heavy lifting of document review by extracting, chunking, and processing the text to perform deep semantic analysis.</p>
+    
+    <p>To mitigate the critical issue of "hallucination" commonly associated with Large Language Models (LLMs), LexAI implements a robust Retrieval-Augmented Generation (RAG) architecture powered by the Google Gemini LLM. By grounding the AI's responses exclusively in the retrieved text of the user's specific document or an admin-curated Legal Knowledge Base, LexAI ensures that generated answers are contextually relevant, highly accurate, and factually verifiable. It is explicitly noted that LexAI acts as an informational assistant and does not replace professional, jurisdictional legal counsel.</p>
+
+    <h2>2. Literature Review</h2>
+    
+    <h3>2.1 Legal Document Summarization</h3>
+    <p>Research by Jain et al. [1] highlights the complexities of generating accurate summaries for legal documents, emphasizing the necessity of preserving factual integrity while condensing extensive case texts. Traditional extractive methods often miss semantic nuance, while generative models risk fabricating legal precedent. This underlines the need for deterministic chunking strategies prior to abstraction, which LexAI adopts to generate safe executive summaries.</p>
+
+    <h3>2.2 Domain-Specific NLP Models</h3>
+    <p>The uniqueness of legal vocabulary requires specialized NLP approaches. Chalkidis et al. [2] demonstrated with LEGAL-BERT that generic language models frequently misinterpret legal nuances, necessitating domain-aware processing. While LexAI utilizes the all-MiniLM-L6-v2 model for generalized embedding efficiency, it relies on structured JSON-schema prompting with the Gemini LLM to enforce domain-specific analytical constraints during generation.</p>
+
+    <h3>2.3 Retrieval-Augmented Generation (RAG)</h3>
+    <p>The integration of non-parametric memory with parametric LLMs was formalized by Lewis et al. [3], establishing RAG as the standard for knowledge-intensive NLP tasks. Their findings proved that querying an external vector index drastically reduces factual hallucinations. LexAI incorporates this exact architecture by utilizing ChromaDB as a semantic vector store, ensuring the AI only processes text explicitly present in the uploaded contract.</p>
+
+    <h3>2.4 Challenges in Legal NLP and Question Answering</h3>
+    <p>Recent surveys by Ariai et al. [4] and Martinez-Gil [5] underscore the ongoing challenges in legal QA systems, particularly concerning model explainability, privacy, and user trust. Public generative AI interfaces pose significant security risks for confidential contracts. Furthermore, unconstrained models often hallucinate standard practices instead of citing specific contractual terms.</p>
+
+    <h3>2.5 Research Gap</h3>
+    <p>While existing literature proves the efficacy of RAG and domain-specific LLMs, there remains a gap in accessible, locally verifiable systems that combine private document analysis, conversational querying, and a curated general legal knowledge base within a single, securely isolated platform. LexAI addresses this gap by enforcing strict database-level filtering (document ID isolation), ensuring users only receive answers grounded in their private contracts or the admin-curated repository, thereby maximizing privacy and mitigating hallucinations.</p>
+
+    <h2>3. Aims & Objective</h2>
+    <p>The primary aim of the LexAI project is to develop a secure, highly accurate, and accessible web-based platform that utilizes Artificial Intelligence to demystify complex legal documents.</p>
+    <p>Specific Objectives:</p>
+    <ul>
+        <li>To securely authenticate users and isolate their uploaded legal documents.</li>
+        <li>To extract and mathematically embed text from uploaded PDF and DOCX files.</li>
+        <li>To implement a Retrieval-Augmented Generation (RAG) pipeline utilizing ChromaDB for highly accurate semantic search.</li>
+        <li>To automatically generate structured executive summaries highlighting key obligations and risks using the Gemini API.</li>
+        <li>To provide a conversational document chatbot strictly grounded in the user's specific uploaded contract.</li>
+        <li>To maintain a deterministic fallback mechanism capable of serving general legal knowledge even if external AI APIs become unavailable.</li>
+    </ul>
+
+    <h2>4. Problem Definition</h2>
+    <p>The sheer volume and archaic terminology of legal text make contracts largely inaccessible to the general public. When presented with standard legal agreements, individuals face several challenges:</p>
+    <ul>
+        <li><strong>Manual Review Effort:</strong> Reading and comprehending dense, multi-page documents requires prohibitive amounts of time.</li>
+        <li><strong>Hidden Risks:</strong> Critical obligations, termination conditions, and liability waivers are frequently obfuscated by legalese, making manual identification error-prone.</li>
+        <li><strong>Retrieval Friction:</strong> Locating the exact clause for a specific question (e.g., "What is the governing law?") via basic keyword search often fails if exact terminology is not used.</li>
+        <li><strong>Unreliable Public AI:</strong> Pasting confidential contracts into public generative AI chatbots poses severe privacy risks, and generic LLMs frequently hallucinate legal answers rather than citing the provided text.</li>
+    </ul>
+
+    <h2>5. Proposed Model</h2>
+    <p>LexAI proposes a decoupled client-server architecture to provide a secure environment for document intelligence.</p>
+    <p>Architecture Components:</p>
+    <ul>
+        <li><strong>Frontend:</strong> Responsive web interface built with HTML5, Bootstrap 5, and JavaScript. Uses DOMPurify to sanitize AI responses and MathJax to render complex logic.</li>
+        <li><strong>Backend Application:</strong> A robust Python Flask server managing session authentication (Flask-Login, Bcrypt), secure routing, and orchestration of the AI pipeline.</li>
+        <li><strong>Relational Database:</strong> MySQL (via SQLAlchemy) stores user credentials, document metadata, and conversation histories.</li>
+        <li><strong>Vector Database & Embeddings:</strong> Extracted document text is processed by a local SentenceTransformers model (all-MiniLM-L6-v2) to generate 384-dimensional embeddings, which are stored in ChromaDB for high-speed semantic retrieval.</li>
+        <li><strong>Generative LLM:</strong> The Google Gemini API processes the retrieved context alongside strict system prompts to generate factual, grounded responses.</li>
+    </ul>
+
+    <h2>6. Methodology</h2>
+    <p>The operational methodology of LexAI is structured into a sequential processing pipeline:</p>
+    <ul>
+        <li><strong>Secure Ingestion:</strong> Users upload PDF or DOCX files. The backend validates file integrity and extracts raw unicode text using PyMuPDF and python-docx.</li>
+        <li><strong>Contextual Chunking:</strong> To accommodate LLM token limits, the text is sliced into manageable overlapping segments (e.g., 500 words with a 50-word overlap) to preserve contextual boundaries.</li>
+        <li><strong>Vectorization:</strong> Each chunk is converted into a mathematical vector embedding locally and indexed in ChromaDB, tagged strictly with the user's ID to prevent cross-contamination.</li>
+        <li><strong>Semantic Retrieval (RAG):</strong> When a user queries a document, their question is embedded into a vector. ChromaDB calculates mathematical similarities and retrieves the top matching chunks.</li>
+        <li><strong>Grounded Generation:</strong> The retrieved chunks are appended to a strict prompt instructing the Gemini API to answer based solely on the provided text. The generated response is formatted in Markdown and returned to the user interface.</li>
+        <li><strong>Deterministic Fallback:</strong> If the Gemini API experiences an outage, a Python fallback parser directly extracts and formats the retrieved raw database chunks, ensuring uninterrupted access to the Knowledge Base.</li>
+    </ul>
+
+    <h2>7. Plan of Work</h2>
+    <p>The project execution was organized into distinct phases separating implemented features from future scope:</p>
+    
+    <p class="bold">Implemented Phases:</p>
+    <ul>
+        <li><strong>Phase 1: Project Setup & Authentication.</strong> Configuration of Flask, MySQL, and implementation of secure Bcrypt user registration and login.</li>
+        <li><strong>Phase 2: Document Processing.</strong> Implementation of secure file uploads, validation, and PyMuPDF/python-docx text extraction pipelines.</li>
+        <li><strong>Phase 3: AI Legal Analysis.</strong> Integration of the Gemini API with structured JSON prompts to generate automated executive summaries.</li>
+        <li><strong>Phase 4: RAG & Chat Interfaces.</strong> Deployment of local SentenceTransformers, ChromaDB vector indexing, and asynchronous Document Chat implementation.</li>
+        <li><strong>Phase 5: Knowledge Base & Testing.</strong> Development of the admin-curated legal Knowledge Base, fallback mechanisms, and comprehensive Pytest validation suites.</li>
+    </ul>
+    
+    <p class="bold">Future Scope (Planned):</p>
+    <ul>
+        <li><strong>Phase 6: Optical Character Recognition (OCR).</strong> Integration of Tesseract OCR to process scanned, image-based legal documents.</li>
+        <li><strong>Phase 7: Multilingual Support.</strong> Expanding semantic models to analyze and translate legal concepts into regional languages.</li>
+    </ul>
+
+    <h2>8. Conclusion</h2>
+    <p>The LexAI platform successfully demonstrates the practical application of Retrieval-Augmented Generation (RAG) in solving the accessibility crisis surrounding legal document comprehension. By integrating an intuitive Flask-based web interface with a robust, locally embedded vector pipeline, LexAI provides a secure, isolated environment for intelligent contract analysis.</p>
+    <p>Through automated executive summaries, semantic clause identification, and conversational querying, the system significantly reduces the cognitive load required to navigate dense legalese. Enforcing strict database isolation and utilizing deterministic fallback mechanisms ensures that the platform remains reliable, private, and highly resistant to AI hallucinations, representing a substantial technological advancement in making legal information transparent and understandable.</p>
+
+    <h2>9. References</h2>
+    <p>[1] Jain, D., Borah, M. D., & Biswas, A. (2021). "Summarization of legal documents: Where are we now and the way forward." <span class="bold">Computer Science Review</span>, 40, 100388.</p>
+    
+    <p>[2] Chalkidis, I., Fergadiotis, M., Malakasiotis, P., Aletras, N., & Androutsopoulos, I. (2020). "LEGAL-BERT: The Muppets straight out of Law School." <span class="bold">Findings of the Association for Computational Linguistics: EMNLP 2020</span>.</p>
+    
+    <p>[3] Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., ... & Riedel, S. (2020). "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks." <span class="bold">Advances in Neural Information Processing Systems (NeurIPS)</span>.</p>
+    
+    <p>[4] Ariai, F., Mackenzie, J., & Demartini, G. (2025). "Natural Language Processing for the Legal Domain: A Survey of Tasks, Datasets, Models, and Challenges." <span class="bold">ACM Computing Surveys</span>, 58(6).</p>
+    
+    <p>[5] Martinez-Gil, J. (2023). "A survey on legal question–answering systems." <span class="bold">Computer Science Review</span>, 48, 100551.</p>
+
+    <!-- Signatures section -->
+    <div class="signatures">
+        <div class="sig-left">
+            <p class="bold">Prof. Dr. Surekha Kohle</p>
+            <p>Guide</p>
+            <p>CS/IT Department</p>
+        </div>
+        <div class="sig-right">
+            <p class="bold">Dr. Praveen Gupta</p>
+            <p>H.O.D.</p>
+            <p>CS/IT Department</p>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+</body>
+</html>

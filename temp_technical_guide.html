@@ -1,0 +1,287 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                margin: 0;
+                padding: 40px;
+            }
+            h1, h2, h3 {
+                color: #0A192F;
+            }
+            h1 {
+                border-bottom: 2px solid #00C8C8;
+                padding-bottom: 10px;
+                text-align: center;
+                font-size: 2.5em;
+            }
+            h2 {
+                color: #00C8C8;
+                margin-top: 40px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 5px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                page-break-inside: avoid;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 12px;
+                text-align: left;
+            }
+            th {
+                background-color: #0A192F;
+                color: white;
+            }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            code {
+                background-color: #f4f4f4;
+                padding: 2px 4px;
+                border-radius: 4px;
+                font-family: Consolas, monospace;
+            }
+            pre {
+                background-color: #f4f4f4;
+                padding: 15px;
+                border-radius: 5px;
+                overflow-x: auto;
+                page-break-inside: avoid;
+            }
+            ul, ol {
+                margin-bottom: 20px;
+            }
+            li {
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>LexAI Complete Technical Master Guide</h1>
+<p><strong>Project:</strong> LexAI – AI-Powered Legal Assistant &amp; Contract Intelligence Platform<br />
+<em>Note: This guide is generated based on a direct inspection of the actual LexAI source code. All routes, database schemas, and AI pipelines reflect the real implementation.</em></p>
+<hr />
+<h2>MODULE 1: DATABASE AND MYSQL MASTERY</h2>
+<h3>A. MySQL Fundamentals</h3>
+<ul>
+<li><strong>Database:</strong> An organized collection of data. In LexAI, we use a relational database where data is stored in tables (like Excel spreadsheets) connected by relationships.</li>
+<li><strong>Primary Key (PK):</strong> A unique ID for every record (e.g., <code>user.id = 1</code>).</li>
+<li><strong>Foreign Key (FK):</strong> A column that links to another table's Primary Key. For example, <code>document.user_id</code> links to <code>user.id</code>, proving who owns the document.</li>
+</ul>
+<h3>B. Actual Database Schema (ER Diagram Logic)</h3>
+<p>LexAI uses 6 core tables defined in <code>models/database_models.py</code>:
+1.  <strong>Users:</strong> <code>id</code> (PK), <code>name</code>, <code>email</code> (Unique), <code>password_hash</code>, <code>role</code>.
+2.  <strong>Documents:</strong> <code>id</code> (PK), <code>user_id</code> (FK -&gt; Users), <code>filename</code>, <code>file_type</code>, <code>status</code>, <code>extracted_text</code>. (One-to-Many: 1 User has Many Documents).
+3.  <strong>DocumentAnalysis:</strong> <code>id</code> (PK), <code>document_id</code> (FK -&gt; Documents), <code>summary</code> (JSON), <code>risks</code> (JSON). (One-to-One: 1 Document has 1 Analysis).
+4.  <strong>Conversations:</strong> <code>id</code> (PK), <code>user_id</code> (FK), <code>document_id</code> (FK). Tracks chat sessions.
+5.  <strong>Messages:</strong> <code>id</code> (PK), <code>conversation_id</code> (FK -&gt; Conversations), <code>sender</code> (user/ai), <code>message</code>.
+6.  <strong>KnowledgeBase:</strong> <code>id</code> (PK), <code>title</code>, <code>content</code>, <code>category</code>. (Curated by Admins).</p>
+<h3>C. SQLAlchemy Explained</h3>
+<p>LexAI uses <strong>Flask-SQLAlchemy</strong> (an ORM - Object Relational Mapper). Instead of writing raw SQL strings, you write Python classes.
+*   <strong>Code Excerpt:</strong> <code>new_doc = Document(user_id=user_id, filename=safe_filename)</code>
+*   <strong>Saving to DB:</strong> <code>db.session.add(new_doc)</code> followed by <code>db.session.commit()</code>.
+*   <strong>Analogy:</strong> The ORM is an automatic translator. You speak Python, and it translates your commands into SQL for MySQL to understand.</p>
+<h3>D. SQL Practical Lab (Safe Queries)</h3>
+<p>To manually inspect your MySQL database via command line:
+*   <code>SHOW TABLES;</code> -&gt; Lists all tables.
+*   <code>DESCRIBE users;</code> -&gt; Shows the columns in the Users table.
+*   <code>SELECT email, role FROM users;</code> -&gt; Fetches all user emails.
+*   <em>(Hypothetical Update)</em>: <code>UPDATE users SET role='admin' WHERE id=1;</code></p>
+<hr />
+<h2>MODULE 2: AI, GEMINI API, CHROMADB AND RAG</h2>
+<h3>A. Gemini API Integration</h3>
+<p>LexAI uses the official <code>google-genai</code> SDK.
+*   <strong>Initialization:</strong> <code>client = genai.Client(api_key=api_key)</code> is called in <code>rag_service.py</code>.
+*   <strong>Model:</strong> Uses <code>gemini-3.6-flash</code> (or the model specified in <code>AI_MODEL</code> config).
+*   <strong>Handling Errors:</strong> Wrapped in a <code>try/except</code> block. If Gemini throws a <code>429 Quota Exceeded</code> error, LexAI triggers <code>construct_fallback_response()</code> to serve raw Knowledge Base data without crashing.</p>
+<h3>B. Document Processing &amp; Chunking</h3>
+<p>Found in <code>document_service.py</code>:
+1.  <strong>Extraction:</strong> PyMuPDF is used for PDFs; <code>python-docx</code> is used for Word files.
+2.  <strong>Chunking (<code>embedding_service.py</code>):</strong> The extracted text is split into chunks of <strong>1000 words</strong> with an overlap of <strong>150 words</strong> to ensure sentences aren't cut in half.</p>
+<h3>C. Embeddings</h3>
+<p>Found in <code>embedding_service.py</code>:
+*   <strong>Model:</strong> LexAI uses the local <code>SentenceTransformer('all-MiniLM-L6-v2')</code>.
+*   <strong>Concept:</strong> It converts text into an array of 384 numbers. Similar texts end up mathematically close to each other in vector space.</p>
+<h3>D. ChromaDB</h3>
+<p>ChromaDB is a local vector database running from the <code>chroma_db</code> folder.
+*   <strong>Collection Name:</strong> <code>lexai_documents</code>.
+*   <strong>Metadata:</strong> Every chunk is saved with metadata like <code>{"user_id": 1, "document_id": "uuid"}</code>. This ensures User A's searches never return User B's documents.</p>
+<h3>E. RAG in LexAI (Step-by-Step)</h3>
+<ol>
+<li>User types "What are my termination risks?"</li>
+<li><code>classify_intent</code> determines if it's Document-Specific or General Legal.</li>
+<li><code>embed_question()</code> converts the question into numbers.</li>
+<li>ChromaDB searches <code>lexai_documents</code> and retrieves the 8 mathematically closest chunks, strictly filtering by <code>user_id</code>.</li>
+<li>These 8 chunks are injected into a massive strict prompt (<code>prompt = f"""You are LexAI... RETRIEVED CONTEXT: {context_text}"""</code>).</li>
+<li>Gemini reads the context and generates an answer strictly based on the provided text.</li>
+</ol>
+<hr />
+<h2>MODULE 3: COMPLETE PROJECT WORKFLOW</h2>
+<h3>Workflow D: Document-Specific Chat (Trace)</h3>
+<ol>
+<li><strong>Frontend:</strong> User clicks "Send" in <code>chatbot.html</code>.</li>
+<li><strong>JS Fetch:</strong> <code>chatbot.js</code> sends a POST request with JSON payload <code>{"message": "hi", "document_id": "123"}</code>.</li>
+<li><strong>Flask Route:</strong> <code>chat_routes.py</code> <code>@chat_bp.route('/api/chat')</code> receives it.</li>
+<li><strong>Service Call:</strong> Calls <code>answer_question(user_id, question, document_id)</code> in <code>rag_service.py</code>.</li>
+<li><strong>ChromaDB:</strong> Filters vectors where <code>document_id == 123</code> and <code>user_id == current_user.id</code>.</li>
+<li><strong>Gemini:</strong> Generates response.</li>
+<li><strong>Database:</strong> Route saves the exchange to the <code>Messages</code> table.</li>
+<li><strong>Frontend:</strong> JS receives JSON, renders Markdown using <code>marked.js</code>, and displays it.</li>
+</ol>
+<hr />
+<h2>MODULE 4: RUNNING ON WINDOWS</h2>
+<ol>
+<li><strong>Open PowerShell</strong> in the project folder (<code>C:\Users\Rohan Bongane\...</code>).</li>
+<li><strong>Activate Virtual Environment:</strong> <code>.\venv\Scripts\activate</code></li>
+<li><strong>Install Dependencies:</strong> <code>pip install -r requirements.txt</code></li>
+<li><strong>Check <code>.env</code>:</strong> Ensure <code>SQLALCHEMY_DATABASE_URI=mysql+pymysql://root:password@localhost/lexai_db</code> is correct and <code>GEMINI_API_KEY</code> is set.</li>
+<li><strong>Start MySQL:</strong> Ensure your MySQL service (e.g., MySQL80) is running in Windows Services.</li>
+<li><strong>Run Server:</strong> <code>python app.py</code>. Wait for "Running on http://127.0.0.1:5000".</li>
+<li><strong>Stop Server:</strong> Press <code>CTRL + C</code>.</li>
+</ol>
+<hr />
+<h2>MODULE 5: TESTING AND PYTEST</h2>
+<p>LexAI has an excellent testing suite in the <code>tests/</code> folder (<code>test_rag.py</code>, <code>test_security.py</code>).
+*   <strong>Run Tests:</strong> <code>pytest tests/</code>
+*   <strong>Fixtures:</strong> <code>conftest.py</code> sets up a temporary database in memory so testing doesn't destroy your real MySQL data.
+*   <strong>Mocking:</strong> Tests use <code>unittest.mock</code> to simulate Gemini API responses so you don't burn through your API quota while testing.</p>
+<hr />
+<h2>MODULE 6: SECURITY REVIEW</h2>
+<ul>
+<li><strong>Verified Protection:</strong> Passwords are mathematically hashed using <code>Flask-Bcrypt</code>.</li>
+<li><strong>Verified Protection:</strong> IDOR Prevention. ChromaDB vector retrieval strictly filters by <code>{"user_id": {"$eq": int(user_id)}}</code>. A user cannot query another user's document vectors.</li>
+<li><strong>Verified Protection:</strong> XSS Prevention. Frontend uses <code>DOMPurify.sanitize()</code> before injecting AI markdown into the chat UI.</li>
+<li><strong>Verified Protection:</strong> Path Traversal. Uploads use <code>werkzeug.secure_filename</code> and absolute path checking.</li>
+<li><strong>Recommended Improvement:</strong> Add rate-limiting (e.g., Flask-Limiter) to prevent users from spamming the Gemini API and exhausting quotas.</li>
+</ul>
+<hr />
+<h2>MODULE 7: TROUBLESHOOTING HANDBOOK</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Symptom</th>
+<th style="text-align: left;">Cause</th>
+<th style="text-align: left;">Safe Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>Access denied for user 'root'@'localhost'</code></td>
+<td style="text-align: left;">Wrong MySQL password in <code>.env</code>.</td>
+<td style="text-align: left;">Open <code>.env</code> and fix the <code>SQLALCHEMY_DATABASE_URI</code> password.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Chat replies: "AI service is busy"</td>
+<td style="text-align: left;">Gemini quota hit or no internet.</td>
+<td style="text-align: left;">Wait a minute. LexAI will automatically use the local KB fallback.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ModuleNotFoundError</code></td>
+<td style="text-align: left;">Venv not active or missing package.</td>
+<td style="text-align: left;">Run <code>venv\Scripts\activate</code> then <code>pip install -r requirements.txt</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Port 5000 is in use</td>
+<td style="text-align: left;">Another python/flask app is running.</td>
+<td style="text-align: left;">Close old terminals or change <code>port=5001</code> in <code>app.py</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>MODULE 8: PRACTICAL LEARNING EXERCISES</h2>
+<p><strong>Exercise 1:</strong> Locate where ChromaDB searches for documents.
+*   <em>File:</em> <code>services/rag_service.py</code>.
+*   <em>Task:</em> Find the <code>collection.query()</code> function and observe how <code>where_filter</code> locks the search to a specific <code>user_id</code>.</p>
+<p><strong>Exercise 2:</strong> Trace the PyMuPDF extraction.
+*   <em>File:</em> <code>services/document_service.py</code>.
+*   <em>Task:</em> Find <code>extract_pdf_text()</code>. See how it iterates over pages and strips white spaces using <code>clean_text()</code>.</p>
+<hr />
+<h2>MODULE 9: 60 MCA VIVA QUESTIONS &amp; ANSWERS</h2>
+<p><em>(Questions 1-20: Database &amp; Architecture)</em>
+1. <strong>What is an ORM?</strong> Object Relational Mapper. It lets us interact with MySQL using Python objects instead of raw SQL strings. LexAI uses Flask-SQLAlchemy.
+2. <strong>What is a Foreign Key in LexAI?</strong> In the <code>Documents</code> table, <code>user_id</code> is a foreign key pointing to the <code>Users</code> table. It ensures every document belongs to a valid user.
+3. <strong>What is the difference between SQLite and MySQL?</strong> SQLite is file-based and used for testing/small apps. MySQL is a robust, concurrent relational database server used in production. LexAI uses MySQL.
+4. <strong>How do you prevent SQL Injection?</strong> By using an ORM like SQLAlchemy, which automatically sanitizes inputs and uses parameterized queries.
+5. <strong>How are passwords secured?</strong> Using <code>Flask-Bcrypt</code>, which hashes and salts the passwords so they are mathematically impossible to reverse-engineer.
+6. <strong>What is Jinja2?</strong> The templating engine Flask uses to dynamically generate HTML before sending it to the browser.
+7. <strong>Why use Blueprints in Flask?</strong> To modularize code. Instead of 100 routes in <code>app.py</code>, we split them into <code>auth_routes</code>, <code>chat_routes</code>, etc.
+8. <strong>What does <code>db.session.commit()</code> do?</strong> It permanently saves the pending database transaction to MySQL.
+9. <strong>What happens if a database operation fails halfway?</strong> We use <code>db.session.rollback()</code> inside a try/except block to undo changes and prevent database corruption.
+10. <strong>Explain a 1-to-Many relationship in your app.</strong> One User can have Many Documents.
+11. <strong>Explain a 1-to-1 relationship in your app.</strong> One Document has One DocumentAnalysis record.
+12. <strong>How does LexAI know who is logged in?</strong> It uses <code>Flask-Login</code> which stores an encrypted session cookie in the user's browser.
+13. <strong>Where are the physical PDFs stored?</strong> In the local file system under <code>uploads/&lt;user_id&gt;/&lt;doc_id&gt;/</code>. The database only stores the file path.
+14. <strong>Why not store PDFs inside MySQL?</strong> Storing large binary files (BLOBs) slows down relational databases. File systems are optimized for files.
+15. <strong>What is a Primary Key?</strong> A unique identifier for a row, like <code>id</code> in the <code>users</code> table.
+16. <strong>What does <code>secure_filename()</code> do?</strong> It prevents directory traversal attacks by removing slashes and dangerous characters from uploaded filenames.
+17. <strong>What is <code>.env</code> used for?</strong> Storing sensitive configuration like DB passwords and API keys outside of the source code.
+18. <strong>Why should <code>.env</code> be in <code>.gitignore</code>?</strong> So you don't accidentally publish your secrets to GitHub.
+19. <strong>What is the entry point of your application?</strong> <code>app.py</code>.
+20. <strong>How does the frontend communicate with the chat API?</strong> Using JavaScript <code>fetch()</code> API to send asynchronous POST requests with JSON payloads.</p>
+<p><em>(Questions 21-40: AI, Embeddings, ChromaDB &amp; RAG)</em>
+21. <strong>What is an Embedding?</strong> A numerical array representing the semantic meaning of text.
+22. <strong>Which embedding model does LexAI use?</strong> <code>SentenceTransformer('all-MiniLM-L6-v2')</code>.
+23. <strong>Why do you chunk documents?</strong> Because LLMs have token limits, and embedding an entire 100-page book at once dilutes the mathematical semantic meaning.
+24. <strong>What is your chunk size?</strong> 1000 words with a 150-word overlap.
+25. <strong>Why overlap chunks?</strong> To ensure a sentence or concept split across two chunks doesn't lose its context.
+26. <strong>What is ChromaDB?</strong> An open-source vector database optimized for storing embeddings and performing similarity searches.
+27. <strong>What is Semantic Search?</strong> Searching by meaning rather than exact keyword matches (e.g., finding "car" when you search for "automobile").
+28. <strong>What metric does ChromaDB use to find similarity?</strong> Cosine distance/similarity or L2 (Euclidean) distance.
+29. <strong>What is RAG?</strong> Retrieval-Augmented Generation. We <em>retrieve</em> facts from ChromaDB, <em>augment</em> the prompt, and <em>generate</em> an answer with Gemini.
+30. <strong>Why use RAG instead of just asking Gemini?</strong> Because Gemini hasn't read the user's private contract, and it might hallucinate legal facts. RAG grounds the AI in reality.
+31. <strong>Does RAG eliminate hallucinations?</strong> No, but it significantly reduces them by forcing the AI to stick to the provided context blocks.
+32. <strong>How does LexAI keep User A from seeing User B's documents in the AI chat?</strong> During ChromaDB queries, we enforce a strict metadata filter: <code>where={"user_id": {"$eq": int(user_id)}}</code>.
+33. <strong>Which library extracts PDF text?</strong> PyMuPDF.
+34. <strong>Which library extracts Word document text?</strong> <code>python-docx</code>.
+35. <strong>What is Intent Classification?</strong> LexAI uses Gemini to quickly categorize a user's question as either "General Legal" or "Document Specific" before searching ChromaDB.
+36. <strong>What happens if Gemini API goes down?</strong> The <code>try/except</code> block catches the error and executes <code>construct_fallback_response()</code>, returning raw Knowledge Base text.
+37. <strong>What is a System Prompt?</strong> Hidden instructions sent to the AI outlining its persona (e.g., "You are LexAI, an AI legal assistant...").
+38. <strong>How do you ensure Gemini doesn't give legally binding advice?</strong> We explicitly command it in the system prompt and append a disclaimer to every response.
+39. <strong>Where does the Knowledge Base data come from?</strong> It is curated and added manually by administrators in the <code>KnowledgeBase</code> table.
+40. <strong>How is the KB separated from user documents in ChromaDB?</strong> They use the metadata tag <code>"source_type": "knowledge_base"</code>.</p>
+<p><em>(Questions 41-60: Testing, Debugging, and Complete Workflow)</em>
+41. <strong>What is Pytest?</strong> A Python testing framework used to write and run automated test cases.
+42. <strong>Why do we mock the Gemini API in tests?</strong> To ensure tests run quickly, work without an internet connection, and don't consume paid API quotas.
+43. <strong>What does a 404 error mean?</strong> The route or page was not found.
+44. <strong>What does a 500 error mean?</strong> Internal Server Error. The Python code crashed.
+45. <strong>How do you debug a 500 error?</strong> Look at the Python traceback in the terminal to see exactly which line of code failed.
+46. <strong>What is a Virtual Environment?</strong> An isolated container for Python dependencies so LexAI's libraries don't clash with other projects on the PC.
+47. <strong>What is AJAX?</strong> Asynchronous JavaScript and XML. It allows updating parts of a web page without reloading the entire page (used in our chat).
+48. <strong>How do you prevent Cross-Site Scripting (XSS)?</strong> By sanitizing user input and using <code>DOMPurify</code> on the frontend before rendering Markdown.
+49. <strong>What is CSRF?</strong> Cross-Site Request Forgery. (If asked, note that Flask-WTF handles this for forms).
+50. <strong>What is IDOR?</strong> Insecure Direct Object Reference. If a user changes a URL parameter from <code>doc_id=1</code> to <code>doc_id=2</code> and sees someone else's document.
+51. <strong>How did you prevent IDOR?</strong> Every document route verifies <code>document.user_id == current_user.id</code>.
+52. <strong>Explain the entire upload-to-chat workflow in 30 seconds.</strong> User uploads PDF. Flask extracts text, chunks it, and embeds it into ChromaDB. When the user asks a question, ChromaDB retrieves relevant chunks, sends them to Gemini inside a prompt, and Gemini generates a contextual answer.
+53. <strong>What is the biggest limitation of your project?</strong> It currently lacks OCR (Optical Character Recognition), so it cannot read scanned image-based PDFs, only digital text PDFs.
+54. <strong>How would you improve this project?</strong> I would integrate OCR, add regional language support (Hindi, Marathi), and migrate ChromaDB to a cloud vector store for horizontal scaling.
+55. <strong>How did you test your RAG pipeline?</strong> By creating a test suite that uploads a mock contract, asks a specific question about it, and asserts that the response contains the expected legal clause.
+56. <strong>What is the role of <code>conftest.py</code>?</strong> It sets up fixtures, like a mock database and test client, that can be shared across all test files.
+57. <strong>How do you handle rate limits from Google Gemini?</strong> The backend checks for HTTP 429/503 errors and gracefully falls back to the deterministic retrieval mode.
+58. <strong>What does the <code>@login_required</code> decorator do?</strong> It intercepts the request and redirects the user to the login page if they don't have an active session cookie.
+59. <strong>Why is <code>__name__</code> passed to <code>Flask(__name__)</code>?</strong> It tells Flask where the application is located on the filesystem so it knows where to find the <code>templates</code> and <code>static</code> folders.
+60. <strong>Can LexAI replace a lawyer?</strong> No, it is an assistive tool for legal professionals and laypeople to quickly parse contracts. Final verification by a human is always mandatory.</p>
+<hr />
+<h2>MODULE 10: FINAL REVISION CHECKLIST</h2>
+<ul>
+<li>[x] Database Schemas created (MySQL/Flask-SQLAlchemy).</li>
+<li>[x] Password Hashing active (Bcrypt).</li>
+<li>[x] Document Text Extraction active (PyMuPDF).</li>
+<li>[x] Embedding Generation active (all-MiniLM-L6-v2).</li>
+<li>[x] Vector Retrieval active &amp; Isolated (ChromaDB).</li>
+<li>[x] AI Integration active (Google GenAI SDK).</li>
+<li>[x] Fallback Mechanism active (rag_service.py).</li>
+<li>[x] Testing Suite available (<code>pytest tests/</code>).</li>
+</ul>
+<p><em>Generated from verified source code analysis on local directory.</em></p>
+    </body>
+    </html>
+    

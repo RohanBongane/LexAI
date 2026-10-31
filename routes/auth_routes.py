@@ -69,9 +69,9 @@ def login():
             next_page = request.args.get('next')
             if next_page:
                 parsed_url = urlparse(next_page)
-                if parsed_url.netloc != '' or parsed_url.scheme != '':
+                if parsed_url.netloc or parsed_url.scheme:
                     next_page = None
-            return redirect(next_page) if next_page else redirect(url_for('main.dashboard'))
+            return redirect(next_page or url_for('main.dashboard'))
         else:
             flash('Invalid email or password.', 'danger')
             

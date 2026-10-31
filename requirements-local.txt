@@ -1,0 +1,3 @@
+# Local development dependencies (includes heavy PyTorch / sentence-transformers)
+-r requirements.txt
+sentence-transformers==3.3.1

@@ -52,12 +52,18 @@ def upload():
             
     return render_template('upload.html')
 
-@document_bp.route('/history')
+@document_bp.route('/analysis')
+@login_required
+def analysis_redirect():
+    return redirect(url_for('document.upload'))
+
+@document_bp.route('/document-history')
+@document_bp.route('/documents')
 @login_required
 def history():
     # Only return documents for the current user
     user_docs = Document.query.filter_by(user_id=current_user.id).order_by(Document.uploaded_at.desc()).all()
-    return render_template('history.html', documents=user_docs)
+    return render_template('document_history.html', documents=user_docs)
 
 @document_bp.route('/analyze/<int:document_id>', methods=['POST'])
 @login_required
@@ -142,10 +148,9 @@ def delete(document_id):
         from services.embedding_service import delete_document_vectors
         delete_document_vectors(str(doc.id), doc.user_id)
 
-        # Delete physical file and its folder
-        file_dir = os.path.dirname(doc.file_path)
-        if os.path.exists(file_dir):
-            shutil.rmtree(file_dir)
+        # Delete physical file from cloud storage or local disk
+        from services.storage_service import delete_document_file
+        delete_document_file(doc.file_path)
             
         # Delete DB record
         db.session.delete(doc)

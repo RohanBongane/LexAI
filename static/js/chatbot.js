@@ -18,11 +18,68 @@ document.addEventListener('DOMContentLoaded', function() {
     // Templates
     const userTpl = document.getElementById('user-message-template');
     const aiTpl = document.getElementById('ai-message-template');
+
+    // --- AI ANSWER POPUP ---
+    const answerPopup = document.getElementById('answer-popup');
+    const answerPopupContent = document.getElementById('answer-popup-content');
+    const closePopupBtn = document.getElementById('close-answer-popup');
+    const closePopupBottomBtn = document.getElementById('close-answer-popup-bottom');
+    const copyPopupBtn = document.getElementById('copy-answer-popup');
+
+    let currentAnswerText = '';
+
+    function showAnswerPopup(answerHtml, sourcesHtml, rawText) {
+        if (!answerPopup || !answerPopupContent) return;
+
+        currentAnswerText = rawText || '';
+        answerPopupContent.innerHTML = answerHtml + (sourcesHtml || '');
+        answerPopup.classList.add('is-open');
+        answerPopup.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise([answerPopupContent]).catch(err => console.error(err));
+        }
+
+        closePopupBtn?.focus();
+    }
+
+    function closeAnswerPopup() {
+        if (!answerPopup) return;
+        answerPopup.classList.remove('is-open');
+        answerPopup.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    closePopupBtn?.addEventListener('click', closeAnswerPopup);
+    closePopupBottomBtn?.addEventListener('click', closeAnswerPopup);
+
+    answerPopup?.addEventListener('click', function (event) {
+        if (event.target === answerPopup) closeAnswerPopup();
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && answerPopup?.classList.contains('is-open')) {
+            closeAnswerPopup();
+        }
+    });
+
+    copyPopupBtn?.addEventListener('click', async function () {
+        try {
+            await navigator.clipboard.writeText(currentAnswerText);
+            copyPopupBtn.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+            setTimeout(() => {
+                copyPopupBtn.innerHTML = '<i class="bi bi-clipboard"></i> Copy Answer';
+            }, 1500);
+        } catch (error) {
+            alert('Copy failed. Please select and copy the answer manually.');
+        }
+    });
     
     // --- MODE SWITCHING ---
     modeCards.forEach(card => {
         card.addEventListener('click', function() {
-            if (!this.hasAttribute('data-mode')) return; // Link to KB
+            if (!this.hasAttribute('data-mode')) return; // Link to KB or History
             
             modeCards.forEach(c => c.classList.remove('active'));
             this.classList.add('active');
@@ -44,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 documentEmptyState.style.display = 'flex';
                 
                 // If a doc is already selected in dropdown, use it
-                if (docSelect.value) {
+                if (docSelect && docSelect.value) {
                     currentDocId = docSelect.value;
                     documentEmptyState.style.display = 'none';
                 }
@@ -59,9 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (currentDocId) {
                 documentEmptyState.style.display = 'none';
                 if(chatMessages.children.length === 1 && chatMessages.children[0].id === 'document-empty-state') {
-                    // Start fresh
                     chatMessages.innerHTML = '';
-                    // Optionally, show a welcome message from AI about the doc
                 }
             } else {
                 chatMessages.innerHTML = '';
@@ -82,8 +137,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- CHAT LOGIC ---
     function appendUserMessage(text) {
-        generalEmptyState.style.display = 'none';
-        documentEmptyState.style.display = 'none';
+        if (generalEmptyState) generalEmptyState.style.display = 'none';
+        if (documentEmptyState) documentEmptyState.style.display = 'none';
         
         const clone = userTpl.content.cloneNode(true);
         clone.querySelector('.message-content').textContent = text;
@@ -91,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scrollToBottom();
     }
     
-    function appendAiMessage(text, sources) {
+    function appendAiMessage(text, sources, triggerPopup = false) {
         const clone = aiTpl.content.cloneNode(true);
         
         // Protect MathJax blocks from marked.js parsing
@@ -123,12 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         clone.querySelector('.message-content').innerHTML = formattedText;
         
-        // Render MathJax if available
-        if (window.MathJax && window.MathJax.typesetPromise) {
-            // Because clone is a DocumentFragment, we can just render its content after appending.
-            // But we append it below.
-        }
-        
+        let sourcesContainerHtml = '';
         if (sources && sources.length > 0) {
             const container = clone.querySelector('.sources-container');
             const list = clone.querySelector('.sources-list');
@@ -160,13 +210,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 div.innerHTML = `<i class="bi ${icon} text-primary"></i> ${s.title || s.filename} <span class="badge bg-light text-dark border ms-auto">${typeText}</span>`;
                 list.appendChild(div);
             });
+            sourcesContainerHtml = container.outerHTML;
         }
         
+        // 1. Always append to timeline so chat history is visible in stream
         chatMessages.appendChild(clone);
         if (window.MathJax && window.MathJax.typesetPromise) {
             MathJax.typesetPromise([chatMessages]).catch(err => console.error(err));
         }
         scrollToBottom();
+
+        // 2. Also open the interactive popup dialog if requested for live replies
+        if (triggerPopup && answerPopup) {
+            showAnswerPopup(formattedText, sourcesContainerHtml, text);
+        }
     }
     
     function showLoading() {
@@ -234,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 const data = await response.json();
                 convIdInput.value = data.conversation_id; 
-                appendAiMessage(data.answer, data.sources);
+                appendAiMessage(data.answer, data.sources, true);
             } else {
                 let errorMsg = "Unknown error occurred.";
                 const contentType = response.headers.get("content-type");
@@ -244,11 +301,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     errorMsg = `Server returned status ${response.status}`;
                 }
-                appendAiMessage("Error: " + errorMsg, []);
+                appendAiMessage("Error: " + errorMsg, [], false);
             }
         } catch (err) {
             removeLoading();
-            appendAiMessage("Network error occurred.", []);
+            appendAiMessage("Error: Unable to connect to server. Please try again.", [], false);
         } finally {
             chatInput.disabled = false;
             submitBtn.disabled = false;
@@ -256,14 +313,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Check URL params on load
+    // --- LOAD SAVED CONVERSATION ---
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('mode') === 'document' && urlParams.get('doc')) {
-        setTimeout(() => {
-            if (docSelect) {
-                docSelect.value = urlParams.get('doc');
-                docSelect.dispatchEvent(new Event('change'));
-            }
-        }, 100);
+    const savedConversationId = urlParams.get('conversation_id');
+
+    if (savedConversationId) {
+        convIdInput.value = savedConversationId;
+
+        fetch(`/api/conversations/${savedConversationId}/messages`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.messages && data.messages.length > 0) {
+                    if (generalEmptyState) generalEmptyState.style.display = 'none';
+                    if (documentEmptyState) documentEmptyState.style.display = 'none';
+
+                    data.messages.forEach(msg => {
+                        if (msg.sender === 'user') {
+                            appendUserMessage(msg.message);
+                        } else {
+                            appendAiMessage(msg.message, [], false);
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error loading conversation:', error));
     }
 });

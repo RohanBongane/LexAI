@@ -1,5 +1,6 @@
 import os
-import uuid
+import io
+import urllib.request
 import pymupdf  # PyMuPDF
 from docx import Document as DocxDocument
 from werkzeug.utils import secure_filename
@@ -12,67 +13,74 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def validate_file(file):
-    if file.filename == '':
+    if not file or file.filename == '':
         return False, "No selected file"
     if not allowed_file(file.filename):
         return False, "Invalid file type. Only PDF and DOCX are allowed."
     return True, None
 
-def save_uploaded_file(file, user_id, upload_folder):
-    """Saves the file to disk and creates an initial database record."""
-    document_id = str(uuid.uuid4())
+def get_file_bytes(filepath_or_url):
+    """Retrieves file bytes from local disk or remote HTTP/HTTPS URL."""
+    if filepath_or_url.startswith(('http://', 'https://')):
+        req = urllib.request.Request(filepath_or_url, headers={'User-Agent': 'LexAI-Serverless/1.0'})
+        with urllib.request.urlopen(req, timeout=30) as response:
+            return response.read()
+    else:
+        with open(filepath_or_url, 'rb') as f:
+            return f.read()
+
+def save_uploaded_file(file, user_id, upload_folder=None):
+    """
+    Saves the file using the pluggable storage service (Cloudinary or Local disk).
+    Creates an initial database record.
+    """
     original_filename = file.filename
     safe_filename = secure_filename(original_filename)
-    
-    # Extract file extension
     file_type = safe_filename.rsplit('.', 1)[1].lower()
     
-    # Target directory: uploads/{user_id}/{document_id}/
-    target_dir = os.path.join(upload_folder, str(user_id), document_id)
+    from services.storage_service import save_document_file
     
-    # Path traversal validation check
-    abs_upload_folder = os.path.abspath(upload_folder)
-    abs_target_dir = os.path.abspath(target_dir)
-    if not abs_target_dir.startswith(abs_upload_folder):
-        raise ValueError("Path traversal attempt detected.")
-        
-    os.makedirs(target_dir, exist_ok=True)
+    storage_meta = save_document_file(file, user_id)
     
-    # Save the physical file
-    file_path = os.path.join(target_dir, safe_filename)
-    file.save(file_path)
-    
-    # Get file size
-    file_size = os.path.getsize(file_path)
-    
-    # Create DB record
+    # Store the primary persistent path (or URL)
     new_doc = Document(
         user_id=user_id,
         filename=safe_filename,
         original_filename=original_filename,
-        file_path=file_path,
+        file_path=storage_meta["file_path"],
         file_type=file_type,
-        file_size=file_size,
+        file_size=storage_meta["file_size"],
         status='processing'
     )
     db.session.add(new_doc)
     db.session.commit()
     
+    # Stash the temp local path on the document object in memory if available for immediate processing
+    if storage_meta.get("temp_local_path"):
+        new_doc._temp_local_path = storage_meta["temp_local_path"]
+        
     return new_doc
 
 def clean_text(text):
     """Cleans extracted text to remove excessive whitespace."""
     if not text:
         return ""
-    # Normalize whitespace
     return " ".join(text.split())
 
-def extract_pdf_text(filepath):
-    """Extracts text from a PDF file using PyMuPDF."""
+def extract_pdf_text(filepath_or_url):
+    """Extracts text from a PDF file using PyMuPDF (supports disk path, memory stream, or remote URL)."""
     text_content = ""
     page_count = 0
+    doc = None
     try:
-        doc = pymupdf.open(filepath)
+        if filepath_or_url.startswith(('http://', 'https://')):
+            file_bytes = get_file_bytes(filepath_or_url)
+            doc = pymupdf.open(stream=file_bytes, filetype="pdf")
+        elif os.path.exists(filepath_or_url):
+            doc = pymupdf.open(filepath_or_url)
+        else:
+            return False, "File path does not exist", 0
+
         page_count = len(doc)
         for page_num in range(page_count):
             page = doc.load_page(page_num)
@@ -82,19 +90,29 @@ def extract_pdf_text(filepath):
         doc.close()
         return True, clean_text(text_content), page_count
     except Exception as e:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
         print(f"Error extracting PDF text: {e}")
         return False, "", 0
 
-def extract_docx_text(filepath):
-    """Extracts text from a DOCX file using python-docx."""
+def extract_docx_text(filepath_or_url):
+    """Extracts text from a DOCX file using python-docx (supports disk path or remote URL)."""
     text_content = ""
     try:
-        doc = DocxDocument(filepath)
+        if filepath_or_url.startswith(('http://', 'https://')):
+            file_bytes = get_file_bytes(filepath_or_url)
+            doc = DocxDocument(io.BytesIO(file_bytes))
+        elif os.path.exists(filepath_or_url):
+            doc = DocxDocument(filepath_or_url)
+        else:
+            return False, "File path does not exist", 0
+
         for para in doc.paragraphs:
             if para.text.strip():
                 text_content += para.text + "\n"
-        # Word doesn't have reliable page counts in docx structure without rendering. 
-        # We'll use a rough estimate (approx 500 words per page)
         words = len(text_content.split())
         page_count = max(1, words // 500)
         return True, clean_text(text_content), page_count
@@ -113,21 +131,24 @@ def analyze_document_statistics(text, page_count):
     }
 
 def process_document(document_id):
-    """Main pipeline for text extraction."""
+    """Main pipeline for text extraction and vector indexing."""
     doc = db.session.get(Document, document_id)
     if not doc:
         return False
         
     try:
+        # Check if an in-memory or temp path exists first, else use doc.file_path
+        target_path = getattr(doc, '_temp_local_path', None) or doc.file_path
+        
         # Extract text based on file type
         if doc.file_type == 'pdf':
-            success, text, page_count = extract_pdf_text(doc.file_path)
+            success, text, page_count = extract_pdf_text(target_path)
         elif doc.file_type == 'docx':
-            success, text, page_count = extract_docx_text(doc.file_path)
+            success, text, page_count = extract_docx_text(target_path)
         else:
             success = False
             
-        if success:
+        if success and text:
             stats = analyze_document_statistics(text, page_count)
             doc.extracted_text = text
             doc.page_count = stats["page_count"]
@@ -141,7 +162,6 @@ def process_document(document_id):
                 doc.status = 'completed'
             else:
                 doc.status = 'indexed_failed'
-                
         else:
             doc.status = 'failed'
             doc.extracted_text = "Text extraction failed or format unsupported."

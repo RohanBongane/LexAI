@@ -1,0 +1,625 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            @page {
+                margin: 0.8in;
+            }
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-size: 10.5pt;
+                line-height: 1.5;
+                color: #222;
+                margin: 0;
+                padding: 10px;
+            }
+            h1 {
+                color: #0A192F;
+                border-bottom: 3px solid #00A3A3;
+                padding-bottom: 8px;
+                font-size: 20pt;
+                margin-top: 10px;
+                margin-bottom: 12px;
+            }
+            h2 {
+                color: #007788;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 4px;
+                font-size: 13pt;
+                margin-top: 24px;
+                margin-bottom: 10px;
+                page-break-after: avoid;
+            }
+            h3 {
+                color: #333;
+                font-size: 11pt;
+                margin-top: 16px;
+                margin-bottom: 6px;
+                page-break-after: avoid;
+            }
+            p {
+                margin-top: 4px;
+                margin-bottom: 8px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 12px 0;
+                font-size: 9.5pt;
+                page-break-inside: avoid;
+            }
+            th, td {
+                border: 1px solid #ccc;
+                padding: 6px 8px;
+                text-align: left;
+                vertical-align: top;
+            }
+            th {
+                background-color: #0A192F;
+                color: #fff;
+                font-weight: 600;
+            }
+            tr:nth-child(even) {
+                background-color: #f7f9fa;
+            }
+            code {
+                background-color: #eef2f5;
+                padding: 2px 4px;
+                border-radius: 3px;
+                font-family: Consolas, 'Courier New', monospace;
+                font-size: 9.5pt;
+                color: #c7254e;
+            }
+            pre {
+                background-color: #1E293B;
+                color: #F8FAFC;
+                padding: 10px 14px;
+                border-radius: 6px;
+                overflow-x: auto;
+                font-family: Consolas, 'Courier New', monospace;
+                font-size: 9pt;
+                line-height: 1.4;
+                margin: 8px 0;
+                page-break-inside: avoid;
+            }
+            pre code {
+                background-color: transparent;
+                color: #F8FAFC;
+                padding: 0;
+            }
+            ul, ol {
+                margin-top: 4px;
+                margin-bottom: 8px;
+                padding-left: 20px;
+            }
+            li {
+                margin-bottom: 4px;
+            }
+            blockquote {
+                background-color: #eff6ff;
+                border-left: 4px solid #3b82f6;
+                margin: 10px 0;
+                padding: 8px 12px;
+                font-size: 9.5pt;
+            }
+            hr {
+                border: 0;
+                border-top: 1px solid #e2e8f0;
+                margin: 18px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>LexAI: Complete Local Setup &amp; Execution Guide for Team Members</h1>
+<p><strong>Platform:</strong> Windows 10 / 11 | <strong>IDE:</strong> Visual Studio Code | <strong>Stack:</strong> Python 3.10–3.12, Flask, MySQL, ChromaDB, Google Gemini API</p>
+<hr />
+<h2>1. Prerequisites &amp; Required Software</h2>
+<p>Before setting up LexAI, ensure your Windows laptop has the required runtime software installed.</p>
+<h3>1.1 Python (Version 3.10 to 3.12, 64-bit)</h3>
+<ul>
+<li><strong>Why:</strong> LexAI utilizes PyTorch, SentenceTransformers (<code>all-MiniLM-L6-v2</code>), and ChromaDB. Python 3.10, 3.11, or 3.12 provide pre-compiled wheels for Windows without needing Visual Studio C++ build tools.</li>
+<li><strong>Download:</strong> <a href="https://www.python.org/downloads/">python.org/downloads</a></li>
+<li>
+<blockquote>
+<p>[!IMPORTANT]
+    &gt; During Python installation on Windows, <strong>YOU MUST CHECK</strong> the box:<br />
+    &gt; <code>☑ Add python.exe to PATH</code> (at the bottom of the installer window).</p>
+</blockquote>
+</li>
+<li><strong>Verification:</strong> Open Windows PowerShell and run:
+    <code>powershell
+    python --version</code>
+    <em>(Expected output: <code>Python 3.10.x</code>, <code>Python 3.11.x</code>, or <code>Python 3.12.x</code>)</em></li>
+</ul>
+<hr />
+<h3>1.2 Visual Studio Code (VS Code)</h3>
+<ul>
+<li><strong>Download:</strong> <a href="https://code.visualstudio.com/">code.visualstudio.com</a></li>
+<li><strong>Recommended Extensions:</strong><ul>
+<li><strong>Python</strong> (by Microsoft)</li>
+<li><strong>Pylance</strong> (by Microsoft)</li>
+</ul>
+</li>
+<li><strong>Verification:</strong>
+    <code>powershell
+    code --version</code></li>
+</ul>
+<hr />
+<h3>1.3 MySQL Server &amp; MySQL Workbench</h3>
+<ul>
+<li><strong>Download:</strong> <a href="https://dev.mysql.com/downloads/installer/">MySQL Community Installer (Windows)</a> (Choose the <code>mysql-installer-community</code> ~300 MB package).</li>
+<li><strong>Components to Select during install:</strong><ol>
+<li><strong>MySQL Server 8.0, 8.4, or 9.x</strong></li>
+<li><strong>MySQL Workbench</strong> (graphical UI for databases)</li>
+</ol>
+</li>
+<li><strong>Setup Password:</strong> Note down the password you set for the default <code>root</code> user during installation (e.g. <code>root123</code> or your personal password).</li>
+<li><strong>Verification:</strong> Verify MySQL service is running on Windows:
+    <code>powershell
+    Get-Service -Name "*mysql*"</code>
+    <em>(Status should say <code>Running</code>, e.g. <code>MySQL80</code>, <code>MySQL84</code>, or <code>MySQL96</code>)</em></li>
+</ul>
+<hr />
+<h3>1.4 Git (Optional)</h3>
+<ul>
+<li>Useful if you want to track changes or clone directly.</li>
+<li><strong>Download:</strong> <a href="https://git-scm.com/download/win">git-scm.com/download/win</a></li>
+<li><strong>Verification:</strong> <code>git --version</code></li>
+</ul>
+<hr />
+<h2>2. Extract and Open the Project in VS Code</h2>
+<h3>2.1 Extracting the Project</h3>
+<ol>
+<li>Locate the <code>LexAI.zip</code> file on your computer (e.g. in your <code>Downloads</code> folder).</li>
+<li>Right-click <code>LexAI.zip</code> and select <strong>Extract All...</strong>.</li>
+<li>Choose an easy path, for example: <code>C:\Projects\LexAI</code> or <code>C:\Users\&lt;YourUsername&gt;\Documents\LexAI</code>.
+    <em>(Avoid deep paths with unusual characters or OneDrive sync folders).</em></li>
+</ol>
+<h3>2.2 Opening in VS Code</h3>
+<ol>
+<li>Open <strong>VS Code</strong>.</li>
+<li>Go to <strong>File &gt; Open Folder...</strong> (or press <code>Ctrl + K, Ctrl + O</code>).</li>
+<li>Select the extracted project folder where <code>app.py</code> is located.</li>
+<li>Open the integrated PowerShell terminal in VS Code:<ul>
+<li>Press <code>Ctrl + `</code> (Backtick) or click <strong>Terminal &gt; New Terminal</strong>.</li>
+</ul>
+</li>
+</ol>
+<h3>2.3 Verify Directory Structure</h3>
+<p>In the integrated terminal, check your current location:</p>
+<pre><code class="language-powershell">Get-Location
+</code></pre>
+<p>Verify that the core project files exist:</p>
+<pre><code class="language-powershell">Get-ChildItem -Name
+</code></pre>
+<p>You should see:
+*   <code>app.py</code> (Application entrypoint)
+*   <code>config.py</code> (Configuration loader)
+*   <code>requirements.txt</code> (Python package list)
+*   <code>models/</code> (SQLAlchemy database models)
+*   <code>routes/</code> (Flask Blueprints: auth, doc, chat, admin, main)
+*   <code>services/</code> (Document processing, RAG, AI, embeddings)
+*   <code>templates/</code> &amp; <code>static/</code> (Jinja2 HTML templates and frontend assets)</p>
+<hr />
+<h2>3. Create and Activate a Virtual Environment</h2>
+<p>A Python Virtual Environment keeps LexAI's dependencies isolated from other Python projects.</p>
+<h3>3.1 Create Virtual Environment</h3>
+<p>Run this in the VS Code terminal (project root):</p>
+<pre><code class="language-powershell">python -m venv venv
+</code></pre>
+<p><em>(Wait 10–20 seconds for the <code>venv</code> folder to be generated).</em></p>
+<h3>3.2 Handling PowerShell Script Execution Policy</h3>
+<p>Windows PowerShell may block running scripts by default with the error:<br />
+<code>cannot be loaded because running scripts is disabled on this system</code>.</p>
+<p>To allow script execution safely for your current terminal session only:</p>
+<pre><code class="language-powershell">Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+</code></pre>
+<p><em>(This is safe and only applies to the current active terminal session).</em></p>
+<h3>3.3 Activate the Virtual Environment</h3>
+<pre><code class="language-powershell">.\venv\Scripts\Activate.ps1
+</code></pre>
+<p>When activated, your terminal prompt will be prefixed with <code>(venv)</code>:</p>
+<pre><code class="language-powershell">(venv) PS C:\Projects\LexAI&gt;
+</code></pre>
+<h3>3.4 Verify the Active Python Interpreter</h3>
+<p>Ensure your commands are using the virtual environment's Python, not the global system Python:</p>
+<pre><code class="language-powershell">Get-Command python | Select-Object -ExpandProperty Source
+</code></pre>
+<p><em>(The path should end in <code>\LexAI\venv\Scripts\python.exe</code>).</em></p>
+<blockquote>
+<p>[!TIP]
+In VS Code, press <code>Ctrl + Shift + P</code>, type <strong>Python: Select Interpreter</strong>, and select <code>Python ('venv': venv) .\venv\Scripts\python.exe</code>. This ensures VS Code autocomplete and linting link directly to your virtual environment.</p>
+</blockquote>
+<hr />
+<h2>4. Install Python Dependencies</h2>
+<h3>4.1 Upgrade Pip</h3>
+<pre><code class="language-powershell">python -m pip install --upgrade pip
+</code></pre>
+<h3>4.2 Install Packages from <code>requirements.txt</code></h3>
+<pre><code class="language-powershell">pip install -r requirements.txt
+</code></pre>
+<h3>What gets installed:</h3>
+<ul>
+<li><strong>Flask 3.0.0, Flask-SQLAlchemy, Flask-Login, Flask-Bcrypt</strong>: Core web framework, ORM, authentication, and secure password hashing.</li>
+<li><strong>PyMySQL</strong>: MySQL database driver.</li>
+<li><strong>PyMuPDF &amp; python-docx</strong>: Document text extraction from PDF and DOCX files.</li>
+<li><strong>google-genai</strong>: Official Google Gemini SDK for legal document analysis and answer generation.</li>
+<li><strong>chromadb</strong>: Local vector database for semantic search and RAG retrieval.</li>
+<li><strong>sentence-transformers</strong>: Local embeddings generation (<code>all-MiniLM-L6-v2</code>).</li>
+<li><strong>pytest</strong>: Automated testing suite.</li>
+</ul>
+<h3>Troubleshooting Package Installation:</h3>
+<ul>
+<li><strong>Network Timeout:</strong> If downloading <code>sentence-transformers</code> or PyTorch times out, run:
+    <code>powershell
+    pip install --default-timeout=1000 -r requirements.txt</code></li>
+<li><strong>Long Path Error on Windows:</strong> If pip complains about filename length, open PowerShell as Administrator and run:
+    <code>powershell
+    New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force</code></li>
+</ul>
+<hr />
+<h2>5. Configure MySQL Server</h2>
+<h3>5.1 Check MySQL Service Status</h3>
+<p>Make sure MySQL is running in Windows:</p>
+<pre><code class="language-powershell">Get-Service -Name &quot;*mysql*&quot;
+</code></pre>
+<p>If the status is <code>Stopped</code>, start it in an Administrator PowerShell:</p>
+<pre><code class="language-powershell">Start-Service -Name MySQL80   # Replace with your actual service name, e.g. MySQL96 or MySQL
+</code></pre>
+<p><em>(Alternatively, press <code>Win + R</code>, type <code>services.msc</code>, locate MySQL, and click "Start").</em></p>
+<h3>5.2 Create the Required Databases</h3>
+<p>LexAI requires two databases:
+1.  <code>lexai_db</code> — The primary production/application database.
+2.  <code>lexai_test</code> — The isolated test database used when running <code>pytest</code>.</p>
+<p>You can create them using <strong>MySQL Command Line Client</strong>, <strong>MySQL Workbench</strong>, or PowerShell.</p>
+<h4>Option A: Using the MySQL CLI</h4>
+<p>Open PowerShell or the "MySQL 8.0 Command Line Client":</p>
+<pre><code class="language-powershell">mysql -u root -p
+</code></pre>
+<p>Enter your MySQL password, then execute:</p>
+<pre><code class="language-sql">CREATE DATABASE IF NOT EXISTS lexai_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS lexai_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+SHOW DATABASES;
+EXIT;
+</code></pre>
+<h4>Option B: Using the Automated Setup Script</h4>
+<p>LexAI includes a script (<code>setup_db.py</code>) that connects to MySQL and creates these databases automatically. Once you configure your <code>.env</code> file (explained in Section 6), you can simply run:</p>
+<pre><code class="language-powershell">python setup_db.py
+</code></pre>
+<hr />
+<h2>6. Configure the <code>.env</code> File (Environment Variables)</h2>
+<p>The <code>.env</code> file contains your private local credentials. It is never committed to Git and is not transferred inside ZIP archives.</p>
+<h3>6.1 Creating the File</h3>
+<ol>
+<li>In VS Code, right-click the root folder in the file explorer and click <strong>New File</strong>.</li>
+<li>Name the file exactly <code>.env</code> (make sure it does not end with <code>.txt</code> or <code>.env.example</code>).</li>
+<li>Copy and paste the template below into <code>.env</code>.</li>
+</ol>
+<h3>6.2 <code>.env</code> Template</h3>
+<pre><code class="language-ini"># Flask Configuration
+FLASK_DEBUG=True
+SECRET_KEY=change_this_to_a_random_secret_key_123456
+
+# MySQL Database Configuration
+DB_USER=root
+DB_PASSWORD=YOUR_ACTUAL_MYSQL_PASSWORD
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=lexai_db
+
+# Google Gemini AI Configuration
+AI_PROVIDER=gemini
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
+AI_MODEL=gemini-3.6-flash
+</code></pre>
+<h3>6.3 Field-by-Field Explanation</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Where to get it / What to enter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>FLASK_DEBUG</code></td>
+<td style="text-align: left;">Enables auto-reloading and debug traceback on error.</td>
+<td style="text-align: left;">Set to <code>True</code> for development.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>SECRET_KEY</code></td>
+<td style="text-align: left;">Encrypts session cookies for Flask-Login.</td>
+<td style="text-align: left;">Any long random string. Generate one via: <code>python -c "import secrets; print(secrets.token_hex(24))"</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DB_USER</code></td>
+<td style="text-align: left;">Your local MySQL username.</td>
+<td style="text-align: left;">Usually <code>root</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DB_PASSWORD</code></td>
+<td style="text-align: left;"><strong>YOUR</strong> local MySQL password.</td>
+<td style="text-align: left;">The password you configured when installing MySQL on your laptop.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DB_HOST</code></td>
+<td style="text-align: left;">Host address of MySQL.</td>
+<td style="text-align: left;"><code>localhost</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DB_PORT</code></td>
+<td style="text-align: left;">Port of MySQL.</td>
+<td style="text-align: left;"><code>3306</code> (default MySQL port).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DB_NAME</code></td>
+<td style="text-align: left;">Database name expected by LexAI.</td>
+<td style="text-align: left;"><strong>Must be <code>lexai_db</code></strong>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>AI_PROVIDER</code></td>
+<td style="text-align: left;">Backend AI provider.</td>
+<td style="text-align: left;"><code>gemini</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>GEMINI_API_KEY</code></td>
+<td style="text-align: left;">Your Google Gemini API Key.</td>
+<td style="text-align: left;">Get a free key at <a href="https://aistudio.google.com/">aistudio.google.com</a>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>AI_MODEL</code></td>
+<td style="text-align: left;">Gemini model name.</td>
+<td style="text-align: left;"><code>gemini-3.6-flash</code> (or <code>gemini-1.5-flash</code> / <code>gemini-2.0-flash</code>).</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>[!NOTE]
+<strong>Special Characters in MySQL Passwords:</strong><br />
+If your MySQL password contains characters like <code>@</code>, <code>#</code>, or <code>%</code>, LexAI automatically handles them safely using <code>urllib.parse.quote_plus</code> in <code>config.py</code>. You do not need to manually URL-encode it in <code>.env</code>.</p>
+</blockquote>
+<hr />
+<h2>7. Protect Environment Variables &amp; Secrets</h2>
+<p>LexAI already has a <code>.gitignore</code> file that includes:</p>
+<pre><code class="language-gitignore">.env
+venv/
+chroma_db/
+chroma_db_test/
+uploads/
+__pycache__/
+</code></pre>
+<ul>
+<li><strong>Verification:</strong> Run <code>git status</code>. Ensure <code>.env</code> is <strong>NOT</strong> listed under untracked files.</li>
+<li><strong>Rule:</strong> Never send your <code>.env</code> file over email, GitHub, or public channels. Each team member uses their own <code>.env</code> file with their local credentials.</li>
+</ul>
+<hr />
+<h2>8. Initialize Database Tables &amp; Admin Account</h2>
+<p>Once <code>.env</code> is saved and MySQL is running:</p>
+<h3>Step 8.1: Create Databases (if not done manually)</h3>
+<pre><code class="language-powershell">python setup_db.py
+</code></pre>
+<p><em>(Expected output: <code>Databases created successfully.</code>)</em></p>
+<h3>Step 8.2: Create Database Tables</h3>
+<p>LexAI uses SQLAlchemy models to generate all 6 tables (<code>users</code>, <code>documents</code>, <code>document_analysis</code>, <code>conversations</code>, <code>messages</code>, <code>knowledge_base</code>).
+Run the initialization script:</p>
+<pre><code class="language-powershell">python init_db.py
+</code></pre>
+<p><em>(Expected output: <code>Database tables initialized. Current Tables in DB: ['conversations', 'document_analysis', 'documents', 'knowledge_base', 'messages', 'users']</code>)</em></p>
+<h3>Step 8.3: Verify MySQL Connection</h3>
+<p>Run this one-line check to verify Flask connects to MySQL:</p>
+<pre><code class="language-powershell">python -c &quot;from app import create_app; from extensions import db; from sqlalchemy import text; app = create_app(); with app.app_context(): print('Connection test successful! Tables:', [r[0] for r in db.session.execute(text('SHOW TABLES;')).fetchall()])&quot;
+</code></pre>
+<h3>Step 8.4: Create an Admin Account</h3>
+<p>To access the Admin Panel (<code>/admin</code>) and manage the Legal Knowledge Base, create an initial admin:</p>
+<pre><code class="language-powershell">python create_admin.py
+</code></pre>
+<p>Enter your name, email (e.g. <code>admin@lexai.local</code>), and an 8+ character password.</p>
+<hr />
+<h2>9. Transfer Existing Database Data (Knowledge Base &amp; Test Data)</h2>
+<p>When copying a project ZIP file, <strong>MySQL database records are not transferred automatically</strong> because MySQL stores data in its own system folder (<code>C:\ProgramData\MySQL</code>).</p>
+<h3>9.1 What Data Needs to Be Transferred?</h3>
+<ul>
+<li><strong>Knowledge Base Articles (<code>knowledge_base</code> table):</strong> The project contains curated Indian legal knowledge base articles used for RAG responses.</li>
+<li><em>Note:</em> Private user accounts and uploaded documents should <strong>not</strong> be transferred for privacy.</li>
+</ul>
+<h3>9.2 How the Team Leader Exports the Knowledge Base</h3>
+<p>On the team leader's laptop:</p>
+<pre><code class="language-powershell">mysqldump -u root -p lexai_db knowledge_base &gt; lexai_knowledge_base.sql
+</code></pre>
+<p><em>(This produces a small, shareable SQL file containing only the legal articles).</em></p>
+<h3>9.3 How the Team Member Imports the SQL File</h3>
+<p>On the team member's laptop:
+1.  Copy <code>lexai_knowledge_base.sql</code> into the project root.
+2.  Import it using PowerShell:
+    <code>powershell
+    Get-Content lexai_knowledge_base.sql | mysql -u root -p lexai_db</code>
+    <em>(Or open <code>lexai_knowledge_base.sql</code> in MySQL Workbench and click </em><em>Execute</em><em>).</em>
+3.  Verify the imported articles:
+    <code>powershell
+    python -c "from app import create_app; from models.database_models import KnowledgeBase; app = create_app(); with app.app_context(): print('Total KB Articles in DB:', KnowledgeBase.query.count())"</code></p>
+<hr />
+<h2>10. Configure ChromaDB &amp; The RAG Pipeline</h2>
+<p>LexAI uses <strong>ChromaDB</strong> as its vector database and <code>SentenceTransformer('all-MiniLM-L6-v2')</code> for generating 384-dimensional mathematical embeddings.</p>
+<h3>10.1 Where ChromaDB Stores Vectors</h3>
+<ul>
+<li>ChromaDB stores its data locally in the <code>chroma_db/</code> directory in the project root (<code>chroma.sqlite3</code>).</li>
+</ul>
+<h3>10.2 First-Time Embedding Model Download</h3>
+<p>When you run LexAI or indexing for the first time, <code>sentence-transformers</code> automatically downloads the lightweight <code>all-MiniLM-L6-v2</code> model (~80 MB) from Hugging Face into your user cache directory. Once downloaded, it runs 100% locally and offline without internet or API keys.</p>
+<h3>10.3 Rebuilding Vector Indexing from MySQL (Zero API Cost)</h3>
+<p>If your <code>chroma_db/</code> folder is empty or was not included in the ZIP, you can index all existing Knowledge Base articles from MySQL into ChromaDB <strong>without spending any Gemini API quota</strong>:</p>
+<p>Run this one-line re-indexing command:</p>
+<pre><code class="language-powershell">python -c &quot;from app import create_app; from models.database_models import KnowledgeBase; from services.embedding_service import index_kb_entry; app = create_app(); with app.app_context(): articles = KnowledgeBase.query.all(); [index_kb_entry(str(a.id), a.title, a.category, a.content, a.source) for a in articles]; print(f'Successfully indexed {len(articles)} articles into ChromaDB.')&quot;
+</code></pre>
+<blockquote>
+<p>[!WARNING]
+<strong>DO NOT</strong> run <code>python scripts/seed_kb.py</code> unless you want to re-generate articles from scratch. <code>seed_kb.py</code> sends 93 separate prompt requests to Gemini, which will quickly exhaust free tier API rate limits. Use the SQL import + local re-index command above instead!</p>
+</blockquote>
+<h3>10.4 Test Local RAG Retrieval</h3>
+<p>To verify that ChromaDB and the RAG service can retrieve and formulate legal answers:</p>
+<pre><code class="language-powershell">python test_rag_local.py
+</code></pre>
+<p><em>(If you see <code>SUCCESS: {'answer': '...', 'sources': [...]}</code>, your RAG pipeline is working!).</em></p>
+<hr />
+<h2>11. Run the Application</h2>
+<h3>11.1 Start the Server</h3>
+<p>Make sure your virtual environment is active <code>(venv)</code> and run:</p>
+<pre><code class="language-powershell">python app.py
+</code></pre>
+<h3>11.2 Expected Terminal Output:</h3>
+<pre><code class="language-text"> * Serving Flask app 'app'
+ * Debug mode: on
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://&lt;Your-IP&gt;:5000
+Press CTRL+C to quit
+</code></pre>
+<h3>11.3 Open the Web Application</h3>
+<p>Open your browser (Chrome, Edge, or Firefox) and navigate to:</p>
+<h3>🌐 <strong>http://127.0.0.1:5000</strong></h3>
+<h3>11.4 Stopping the Server</h3>
+<p>To stop the Flask server, click inside the terminal and press:
+<code>Ctrl + C</code></p>
+<hr />
+<h2>12. Feature Verification Checklist</h2>
+<p>Perform these quick tests to confirm everything works:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Action</th>
+<th style="text-align: left;">Expected Successful Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Homepage</strong></td>
+<td style="text-align: left;">Open <code>http://127.0.0.1:5000</code></td>
+<td style="text-align: left;">Clean landing page with "Login" and "Get Started" buttons.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Registration</strong></td>
+<td style="text-align: left;">Click "Sign Up", fill form, submit</td>
+<td style="text-align: left;">Redirects to Login page with success alert.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Login</strong></td>
+<td style="text-align: left;">Log in with registered user</td>
+<td style="text-align: left;">Redirects to Dashboard with user name in navigation bar.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Document Upload</strong></td>
+<td style="text-align: left;">Upload sample <code>.pdf</code> or <code>.docx</code> contract</td>
+<td style="text-align: left;">Progress bar completes; file appears in document list with <code>completed</code> status and word/page counts.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>AI Analysis</strong></td>
+<td style="text-align: left;">Click "Analyze Document" on uploaded file</td>
+<td style="text-align: left;">Gemini analyzes contract and displays structured executive summary, risk analysis, and obligations.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Document Chat</strong></td>
+<td style="text-align: left;">Open chat for the uploaded document; ask a question</td>
+<td style="text-align: left;">AI answers strictly based on the clauses in the uploaded contract.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>General Legal Chat</strong></td>
+<td style="text-align: left;">Open "General Legal Assistant"; ask: "What is an NDA?"</td>
+<td style="text-align: left;">AI answers using retrieved context from Knowledge Base articles.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Admin Panel</strong></td>
+<td style="text-align: left;">Log in with admin account, navigate to <code>/admin</code></td>
+<td style="text-align: left;">Admin dashboard loads showing system stats and KB management tools.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Automated Tests</strong></td>
+<td style="text-align: left;">In a separate terminal, run: <code>pytest tests/</code></td>
+<td style="text-align: left;">All test suites pass against the isolated <code>lexai_test</code> database.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>13. Practical Troubleshooting Guide</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Issue / Error Message</th>
+<th style="text-align: left;">Likely Cause</th>
+<th style="text-align: left;">Solution / Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>python : The term 'python' is not recognized</code></td>
+<td style="text-align: left;">Python not added to Windows PATH.</td>
+<td style="text-align: left;">Re-run Python installer, choose "Modify", and check <code>Add python.exe to PATH</code>. Or specify full path <code>C:\Users\&lt;User&gt;\AppData\Local\Programs\Python\Python312\python.exe</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Activate.ps1 cannot be loaded because running scripts is disabled</code></td>
+<td style="text-align: left;">PowerShell execution policy restriction.</td>
+<td style="text-align: left;">Run <code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process</code> in the current terminal, then retry <code>.\venv\Scripts\Activate.ps1</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Can't connect to MySQL server on 'localhost' (10061)</code></td>
+<td style="text-align: left;">MySQL Windows Service is not running.</td>
+<td style="text-align: left;">Run <code>Start-Service -Name MySQL80</code> (or <code>MySQL96</code>) in Administrator PowerShell, or start it via <code>services.msc</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Access denied for user 'root'@'localhost' (using password: YES)</code></td>
+<td style="text-align: left;">Incorrect MySQL password in <code>.env</code>.</td>
+<td style="text-align: left;">Open <code>.env</code> and verify <code>DB_PASSWORD</code> matches your local MySQL root password.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Unknown database 'lexai_db'</code></td>
+<td style="text-align: left;">Database has not been created yet.</td>
+<td style="text-align: left;">Run <code>python setup_db.py</code> or execute <code>CREATE DATABASE lexai_db;</code> in MySQL.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ModuleNotFoundError: No module named 'flask'</code></td>
+<td style="text-align: left;">Virtual environment is not activated.</td>
+<td style="text-align: left;">Run <code>.\venv\Scripts\Activate.ps1</code>. Verify <code>(venv)</code> appears in the prompt.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>GEMINI_API_KEY is not configured</code></td>
+<td style="text-align: left;">Missing or empty key in <code>.env</code>.</td>
+<td style="text-align: left;">Add <code>GEMINI_API_KEY=your_key</code> in <code>.env</code> and restart <code>python app.py</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>429 Resource Exhausted / Quota Exceeded</code></td>
+<td style="text-align: left;">Gemini API free tier rate limit reached.</td>
+<td style="text-align: left;">LexAI automatically uses local Knowledge Base fallback! Wait 60 seconds or switch <code>AI_MODEL</code> in <code>.env</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Address already in use (Port 5000)</code></td>
+<td style="text-align: left;">Another process is using port 5000.</td>
+<td style="text-align: left;">Find and stop the old process: <code>Get-Process python \| Stop-Process -Force</code> or change port in <code>app.py</code> line 64: <code>port=5001</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ChromaDB / sqlite3 error</code></td>
+<td style="text-align: left;">Corrupt or mismatched vector database.</td>
+<td style="text-align: left;">Delete the <code>chroma_db/</code> folder and re-run the zero-cost indexing command from Section 10.3.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>14. Daily Quick-Start Checklist</h2>
+<p>After completing the initial setup above, your regular daily startup workflow is simple:</p>
+<ol>
+<li>Open VS Code in the LexAI project folder.</li>
+<li>Open PowerShell terminal (<code>Ctrl + `</code>).</li>
+<li>Activate virtual environment:
+    <code>powershell
+    .\venv\Scripts\Activate.ps1</code></li>
+<li>Start LexAI:
+    <code>powershell
+    python app.py</code></li>
+<li>Open your browser at <strong>http://127.0.0.1:5000</strong>.</li>
+<li>When finished, press <code>Ctrl + C</code> in the terminal to stop the server.</li>
+</ol>
+    </body>
+    </html>
+    

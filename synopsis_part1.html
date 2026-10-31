@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page { size: A4; margin: 1in; }
+        body {
+            font-family: "Bookman Old Style", serif; font-size: 12pt;
+            line-height: 1.5; color: black; text-align: justify;
+            margin: 0; padding: 0;
+        }
+        .page-border {
+            position: fixed; top: -0.5in; left: -0.5in; right: -0.5in; bottom: -0.5in;
+            border: 1px solid black; z-index: -100; pointer-events: none;
+        }
+        h2, h3 { font-size: 12pt; font-weight: bold; margin-top: 0; margin-bottom: 12px; }
+        p { margin-bottom: 12px; margin-top: 0; }
+        ul { margin-top: 0; margin-bottom: 12px; padding-left: 20px; }
+        li { margin-bottom: 6px; }
+        .main-section { page-break-before: always; }
+        .main-section:first-of-type { page-break-before: auto; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 10pt; }
+        th, td { border: 1px solid black; padding: 6px; text-align: left; }
+        th { font-weight: bold; }
+        .cover-page, .guide-page { page-break-after: always; }
+        .cover-page img { width: 1.5in; height: auto; margin: 20px 0; }
+        .cover-page p, .guide-page p { text-align: center; margin: 0; }
+        .bold { font-weight: bold; }
+        .signatures { width: 100%; margin-top: 60px; page-break-inside: avoid; border: none; }
+        .signatures td { border: none; padding: 0; }
+        .sig-right { text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="page-border"></div>
+
+    <div class="cover-page">
+        <br><br><br>
+        <p class="bold">PROJECT SYNOPSIS</p>
+        <p class="bold">On</p><br>
+        <p class="bold">“LexAI – AI-Powered Legal Assistant & Contract Intelligence Platform”</p><br><br><br>
+        <p class="bold">Submitted to</p><br>
+        <p class="bold">Chhatrapati Shivaji Maharaj University, Panvel, Navi Mumbai</p><br><br>
+        <p style="text-align:center;"><img src="csmu_logo.png" alt="CSMU Logo"></p><br><br>
+        <p>for the partial fulfillment of requirement for the Degree of</p><br>
+        <p class="bold">MASTER OF COMPUTER APPLICATION</p><br><br><br>
+        <p class="bold">Submitted By</p><br>
+        <p>Rohan Bongane</p>
+        <p>Harsh Jha</p>
+        <p>Aishwariya Bhunia</p>
+        <p>Nitu Sharma</p>
+    </div>
+    <div class="guide-page">
+        <br><br><br><br><br><br><br><br><br><br><br>
+        <p class="bold">Guide</p><br>
+        <p>Dr. Surekha Kohle</p><br><br><br><br><br><br>
+        <p class="bold">Department of Computer Science & Information Technology</p>
+        <p class="bold">Chhatrapati Shivaji Maharaj University, Panvel, Navi Mumbai</p><br><br>
+        <p class="bold">Academic Year:</p>
+        <p class="bold">2026–27</p>
+    </div>
+</body></html>
