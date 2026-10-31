@@ -58,3 +58,6 @@ page_breakdown.py
 render_pages.py
 extracted_original_text.txt
 
+
+.vercel
+.env*
