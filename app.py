@@ -56,6 +56,15 @@ def create_app(config_class=Config):
             return jsonify({"error": "Internal Server Error"}), 500
         return render_template('500.html'), 500
 
+    # Ensure tables exist on boot
+    with app.app_context():
+        try:
+            # Import models to register them with SQLAlchemy metadata
+            from models import database_models
+            db.create_all()
+        except Exception as e:
+            app.logger.warning(f"Database auto-creation skipped or deferred: {e}")
+
     return app
 
 if __name__ == '__main__':

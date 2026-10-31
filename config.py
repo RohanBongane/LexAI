@@ -18,6 +18,12 @@ class Config:
         elif DATABASE_URL.startswith('postgres://'):
             DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
         SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    elif os.getenv('VERCEL') or os.getenv('AWS_LAMBDA_FUNCTION_NAME'):
+        # On Vercel, if no remote DATABASE_URL is configured, fallback to ephemeral SQLite in /tmp
+        # so the application boots and runs gracefully without crashing on unreachable localhost:3306
+        import tempfile
+        db_path = os.path.join(tempfile.gettempdir(), 'lexai_ephemeral.db').replace('\\', '/')
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{db_path}"
     else:
         DB_USER     = os.getenv('DB_USER', 'root')
         DB_PASSWORD = os.getenv('DB_PASSWORD', '')
@@ -33,22 +39,25 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Serverless-Optimized Connection Pool
-    # Ensures connections don't drop or stale in stateless serverless environments
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_pre_ping": True,
-        "pool_recycle": 280,
-        "pool_timeout": 20,
-    }
+    if SQLALCHEMY_DATABASE_URI.startswith('sqlite'):
+        SQLALCHEMY_ENGINE_OPTIONS = {}
+    else:
+        # Ensures connections don't drop or stale in stateless serverless environments
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            "pool_pre_ping": True,
+            "pool_recycle": 280,
+            "pool_timeout": 20,
+        }
 
-    # SSL Support for Hosted MySQL (e.g. TiDB Cloud, Aiven, PlanetScale)
-    DB_SSL_CA = os.getenv('DB_SSL_CA')
-    if DB_SSL_CA:
-        SQLALCHEMY_ENGINE_OPTIONS["connect_args"] = {"ssl": {"ca": DB_SSL_CA}}
-    elif os.getenv('DB_SSL', 'false').lower() in ('1', 'true', 'yes'):
-        # Enable default SSL context for providers with valid public certificates
-        import ssl
-        ctx = ssl.create_default_context()
-        SQLALCHEMY_ENGINE_OPTIONS["connect_args"] = {"ssl": ctx}
+        # SSL Support for Hosted MySQL (e.g. TiDB Cloud, Aiven, PlanetScale)
+        DB_SSL_CA = os.getenv('DB_SSL_CA')
+        if DB_SSL_CA:
+            SQLALCHEMY_ENGINE_OPTIONS["connect_args"] = {"ssl": {"ca": DB_SSL_CA}}
+        elif os.getenv('DB_SSL', 'false').lower() in ('1', 'true', 'yes'):
+            # Enable default SSL context for providers with valid public certificates
+            import ssl
+            ctx = ssl.create_default_context()
+            SQLALCHEMY_ENGINE_OPTIONS["connect_args"] = {"ssl": ctx}
 
     # Production Cookie Security
     SESSION_COOKIE_HTTPONLY = True
